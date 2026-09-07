@@ -643,9 +643,9 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 # ====================== تشغيل البوت ======================
 def main():
-    TOKEN = os.environ.get("8809333549:AAFOmZKayjRsALGuKjnwRtWZTgDMCgj9VO4")
+    TOKEN = os.environ.get("TOKEN")
     if not TOKEN:
-        raise ValueError("لم يتم تعيين متغير TOKEN في البيئة!")
+        raise ValueError("لم يتم تعيين متغير TOKEN في البيئة !!")
     
     logging.basicConfig(level=logging.INFO)
     app = Application.builder().token(TOKEN).build()
