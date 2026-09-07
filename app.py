@@ -10,8 +10,9 @@ logging.basicConfig(
 )
 
 # ====================== 1. المودات (MoDs) ======================
-MODS = [
-    {"num": "1️⃣", "name": "مود السيف الناري", "icon": "🔥", "link": "https://mcpedl.com/?s=fire+sword"},
+MODS = {
+    "جميع المودات": [
+            {"num": "1️⃣", "name": "مود السيف الناري", "icon": "🔥", "link": "https://mcpedl.com/?s=fire+sword"},
     {"num": "2️⃣", "name": "مود البندقية", "icon": "🔫", "link": "https://mcpedl.com/?s=gun+mod"},
     {"num": "3️⃣", "name": "مود درع التنين", "icon": "🐉", "link": "https://mcpedl.com/?s=dragon+armor"},
     {"num": "4️⃣", "name": "مود السيف الماسي العملاق", "icon": "💎", "link": "https://mcpedl.com/?s=giant+diamond+sword"},
@@ -205,116 +206,106 @@ MODS = [
     {"num": "1️⃣6️⃣8️⃣", "name": "مود السيف المضيء", "icon": "✨", "link": "https://mcpedl.com/?s=glowing+sword"},
     {"num": "1️⃣6️⃣9️⃣", "name": "مود الكرة الماسية", "icon": "🔮", "link": "https://mcpedl.com/?s=diamond+ball"},
     {"num": "1️⃣7️⃣0️⃣", "name": "مود التخييم", "icon": "🏕️", "link": "https://mcpedl.com/?s=camping"},
-]
+    ]
+}
 
 # ====================== 2. المابات (MaPs) ======================
-MAPS = [
-    {"num": "0️⃣", "name": "مـاب بـاركـور الـجـبل", "icon": "🧥", "link": "https://mcpedl.com/mountain-parkour-map/"},
-    {"num": "0️⃣", "name": "مـاب بـاركـور الـبـيـضه", "icon": "❤️", "link": "https://mcpedl.com/the-white-parkour-map/"},
-    {"num": "0️⃣", "name": "مـاب سـكـاي فـكـتـري", "icon": "✔️", "link": "https://mcpedl.com/sky-factory-map/"},
-    {"num": "0️⃣", "name": "مـاب نـهـاية العـالم", "icon": "📕", "link": "https://mcpedl.com/the-end-of-the-world-map/"},
-    {"num": "0️⃣", "name": "مـاب تـدريـب PVP", "icon": "💀", "link": "https://mcpedl.com/pvp-training-map/"},
-   
-     # === 『• عَوَالِم مَفْتُوحَة •』 ===
-    {"name": "إِمِيرْشِنْ إَرْثْ 2027", "category": "عَوَالِم مَفْتُوحَة", "link": "https://mcpedl.com/?s=Immersion+Earth+2027"},
-    {"name": "لُوسْ سَانْتُوسْ رِيمَيْكْ", "category": "عَوَالِم مَفْتُوحَة", "link": "https://mcpedl.com/?s=Los+Santos+Remake"},
-    {"name": "أَرْبَانْ سْتُورِيزْ مَابْ", "category": "عَوَالِم مَفْتُوحَة", "link": "https://mcpedl.com/?s=Urban+Stories+Map"},
-    {"name": "سِيكْلُودِدْ بَارَادَايْزْ", "category": "عَوَالِم مَفْتُوحَة", "link": "https://mcpedl.com/?s=Secluded+Paradise"},
-    {"name": "سَانْلِتْ هَارْبُورْ", "category": "عَوَالِم مَفْتُوحَة", "link": "https://mcpedl.com/?s=Sunlit+Harbor"},
-    {"name": "مِيدِيفَالْ كِينْغْدُومْ", "category": "عَوَالِم مَفْتُوحَة", "link": "https://mcpedl.com/?s=Medieval+Kingdom"},
-    {"name": "فْيُوتْشُرِسْتِكْ سِيتِي", "category": "عَوَالِم مَفْتُوحَة", "link": "https://mcpedl.com/?s=Futuristic+City"},
-
-    # === 『• مُغَامَرَات وَبَقَاء •』 ===
-    {"name": "أُوشِنْبَاوُنْدْ مَابْ", "category": "مُغَامَرَات", "link": "https://mcpedl.com/?s=Oceanbound+Map"},
-    {"name": "دَايْنُوفَالِيْ مَابْ", "category": "مُغَامَرَات", "link": "https://mcpedl.com/?s=DinoValley+Map"},
-    {"name": "أَنْشِنْتْ لِيجِنْدْزْ مَابْ", "category": "مُغَامَرَات", "link": "https://mcpedl.com/?s=Ancient+Legends"},
-    {"name": "سْكَايْ رِيلْمْ أَدْفِنْتْشَرْ", "category": "مُغَامَرَات", "link": "https://mcpedl.com/?s=Sky+Realm+Adventure"},
-    {"name": "فْلُوتِنْغْ فِنْتْشَرْ", "category": "مُغَامَرَات", "link": "https://mcpedl.com/?s=Floating+Venture"},
-    {"name": "سَرْفَايْفَلْ آيْلَنْدْ 2026", "category": "مُغَامَرَات", "link": "https://mcpedl.com/?s=Survival+Island"},
-
-    # === 『• رُعْب وَغُمُوض •』 ===
-    {"name": "نَايْتْمَيْرْ تُونْ سِيتِي", "category": "رُعْب", "link": "https://mcpedl.com/?s=Nightmare+Toon+City"},
-    {"name": "مُوفِنْغْ كُولُوسُسْ", "category": "رُعْب", "link": "https://mcpedl.com/?s=Moving+Colossus"},
-    {"name": "إِنْفِكْتِدْ كَاتَاكُمْبْسْ", "category": "رُعْب", "link": "https://mcpedl.com/?s=Infected+Catacombs"},
-    {"name": "إِسْكِيبْ ذَا مَيْزْ", "category": "رُعْب", "link": "https://mcpedl.com/?s=Escape+The+Maze"},
-
-    # === 『• أَلْعَاب مُصَغَّرَة •』 ===
-    {"name": "مَايْسَرْفَرْ مِينِيغَيْمْزْ", "category": "أَلْعَاب مُصَغَّرَة", "link": "https://mcpedl.com/?s=MyServer+Minigames"},
-    {"name": "إِكْسْ وَايْ زِيْ مِينِيغَيْمْزْ", "category": "أَلْعَاب مُصَغَّرَة", "link": "https://mcpedl.com/?s=XYZ+MINIGAMES"},
-    {"name": "كَاوُنْتَرْ سْتْرَايْكْ بِيدْرُوكْ", "category": "أَلْعَاب مُصَغَّرَة", "link": "https://mcpedl.com/?s=Counter+Strike+Bedrock"},
-    {"name": "بِيدْ وَارْزْ آرِينَا", "category": "أَلْعَاب مُصَغَّرَة", "link": "https://mcpedl.com/?s=Bed+Wars+Arena"},
-
-    # === 『• إِبْدَاع وَبِنَاء •』 ===
-    {"name": "أُلْتِيمِتْ سَرْفَايْفَلْ", "category": "إِبْدَاع", "link": "https://mcpedl.com/?s=Ultimate+Survival"},
-    {"name": "كِيبْلَرْ وُرْلْدْ", "category": "إِبْدَاع", "link": "https://mcpedl.com/?s=Kepler+World"},
-    {"name": "فِرْدَنْتْ بِيكْسْ", "category": "إِبْدَاع", "link": "https://mcpedl.com/?s=Verdant+Peaks"},
-    {"name": "هَانِيْوُودْ أَدْفِنْتْشَرْزْ", "category": "إِبْدَاع", "link": "https://mcpedl.com/?s=Honeywood+Adventures"},
-    {"name": "سُوسَايِتِي بِلْدَرْ", "category": "إِبْدَاع", "link": "https://mcpedl.com/?s=Society+Builder"},
-
-    # === 『• مُحِيطَات وَجُزُر •』 ===
-    {"name": "أُوشِنْ لَايْفْ مَابْ", "category": "مُحِيطَات", "link": "https://mcpedl.com/?s=Ocean+Life+Map"},
-    {"name": "هُورَايْزُنْ آيْلَنْدْزْ", "category": "مُحِيطَات", "link": "https://mcpedl.com/?s=Horizons+Islands"},
-    {"name": "دِيمِينْيُوتُوسْ بِيدْرُوكْ 2", "category": "مُحِيطَات", "link": "https://mcpedl.com/?s=Diminutos+Bedrock+2"},
-    {"name": "فْيُوجِنْ لَابْ 2.0", "category": "مُحِيطَات", "link": "https://mcpedl.com/?s=Fusion+Lab"},
-
-    # === 『• تَحَدِّيَات •』 ===
-    {"name": "وَانْ بْلُوكْ سْكَايْبْلُوكْ", "category": "تَحَدِّيَات", "link": "https://mcpedl.com/one-block-map/"},
-    {"name": "بَارْكُورْ بَارَادَايْزْ", "category": "تَحَدِّيَات", "link": "https://mcpedl.com/?s=Parkour+Paradise"},
-    {"name": "سْكَايْ غْرِيدْ تْشَالِنْجْ", "category": "تَحَدِّيَات", "link": "https://mcpedl.com/?s=SkyGrid+Challenge"},
-]
+MAPS = {
+    "عَوَالِم مَفْتُوحَة": [
+        {"name": "إِمِيرْشِنْ إَرْثْ 2027", "icon": "🌍", "link": "https://mcpedl.com/?s=Immersion+Earth+2027"},
+        {"name": "لُوسْ سَانْتُوسْ رِيمَيْكْ", "icon": "🌆", "link": "https://mcpedl.com/?s=Los+Santos+Remake"},
+        {"name": "أَرْبَانْ سْتُورِيزْ مَابْ", "icon": "🏙️", "link": "https://mcpedl.com/?s=Urban+Stories+Map"},
+        {"name": "سِيكْلُودِدْ بَارَادَايْزْ", "icon": "🏝️", "link": "https://mcpedl.com/?s=Secluded+Paradise"},
+        {"name": "سَانْلِتْ هَارْبُورْ", "icon": "🌅", "link": "https://mcpedl.com/?s=Sunlit+Harbor"},
+        {"name": "مِيدِيفَالْ كِينْغْدُومْ", "icon": "🏰", "link": "https://mcpedl.com/?s=Medieval+Kingdom"},
+        {"name": "فْيُوتْشُرِسْتِكْ سِيتِي", "icon": "🚀", "link": "https://mcpedl.com/?s=Futuristic+City"},
+    ],
+    "مُغَامَرَات": [
+        {"name": "أُوشِنْبَاوُنْدْ مَابْ", "icon": "🌊", "link": "https://mcpedl.com/?s=Oceanbound+Map"},
+        {"name": "دَايْنُوفَالِيْ مَابْ", "icon": "🦖", "link": "https://mcpedl.com/?s=DinoValley+Map"},
+        {"name": "أَنْشِنْتْ لِيجِنْدْزْ مَابْ", "icon": "📜", "link": "https://mcpedl.com/?s=Ancient+Legends"},
+        {"name": "سْكَايْ رِيلْمْ أَدْفِنْتْشَرْ", "icon": "☁️", "link": "https://mcpedl.com/?s=Sky+Realm+Adventure"},
+        {"name": "فْلُوتِنْغْ فِنْتْشَرْ", "icon": "🎈", "link": "https://mcpedl.com/?s=Floating+Venture"},
+        {"name": "سَرْفَايْفَلْ آيْلَنْدْ 2026", "icon": "🏝️", "link": "https://mcpedl.com/?s=Survival+Island"},
+    ],
+    "رُعْب": [
+        {"name": "نَايْتْمَيْرْ تُونْ سِيتِي", "icon": "👻", "link": "https://mcpedl.com/?s=Nightmare+Toon+City"},
+        {"name": "مُوفِنْغْ كُولُوسُسْ", "icon": "🗿", "link": "https://mcpedl.com/?s=Moving+Colossus"},
+        {"name": "إِنْفِكْتِدْ كَاتَاكُمْبْسْ", "icon": "💀", "link": "https://mcpedl.com/?s=Infected+Catacombs"},
+        {"name": "إِسْكِيبْ ذَا مَيْزْ", "icon": "🌀", "link": "https://mcpedl.com/?s=Escape+The+Maze"},
+    ],
+    "أَلْعَاب مُصَغَّرَة": [
+        {"name": "مَايْسَرْفَرْ مِينِيغَيْمْزْ", "icon": "🎮", "link": "https://mcpedl.com/?s=MyServer+Minigames"},
+        {"name": "إِكْسْ وَايْ زِيْ مِينِيغَيْمْزْ", "icon": "🎲", "link": "https://mcpedl.com/?s=XYZ+MINIGAMES"},
+        {"name": "كَاوُنْتَرْ سْتْرَايْكْ بِيدْرُوكْ", "icon": "🔫", "link": "https://mcpedl.com/?s=Counter+Strike+Bedrock"},
+        {"name": "بِيدْ وَارْزْ آرِينَا", "icon": "⚔️", "link": "https://mcpedl.com/?s=Bed+Wars+Arena"},
+    ],
+    "إِبْدَاع": [
+        {"name": "أُلْتِيمِتْ سَرْفَايْفَلْ", "icon": "🏆", "link": "https://mcpedl.com/?s=Ultimate+Survival"},
+        {"name": "كِيبْلَرْ وُرْلْدْ", "icon": "🔭", "link": "https://mcpedl.com/?s=Kepler+World"},
+        {"name": "فِرْدَنْتْ بِيكْسْ", "icon": "⛰️", "link": "https://mcpedl.com/?s=Verdant+Peaks"},
+        {"name": "هَانِيْوُودْ أَدْفِنْتْشَرْزْ", "icon": "🐝", "link": "https://mcpedl.com/?s=Honeywood+Adventures"},
+        {"name": "سُوسَايِتِي بِلْدَرْ", "icon": "🏗️", "link": "https://mcpedl.com/?s=Society+Builder"},
+    ],
+    "مُحِيطَات": [
+        {"name": "أُوشِنْ لَايْفْ مَابْ", "icon": "🐠", "link": "https://mcpedl.com/?s=Ocean+Life+Map"},
+        {"name": "هُورَايْزُنْ آيْلَنْدْزْ", "icon": "🌺", "link": "https://mcpedl.com/?s=Horizons+Islands"},
+        {"name": "دِيمِينْيُوتُوسْ بِيدْرُوكْ 2", "icon": "🐙", "link": "https://mcpedl.com/?s=Diminutos+Bedrock+2"},
+        {"name": "فْيُوجِنْ لَابْ 2.0", "icon": "⚗️", "link": "https://mcpedl.com/?s=Fusion+Lab"},
+    ],
+    "تَحَدِّيَات": [
+        {"name": "وَانْ بْلُوكْ سْكَايْبْلُوكْ", "icon": "🧱", "link": "https://mcpedl.com/one-block-map/"},
+        {"name": "بَارْكُورْ بَارَادَايْزْ", "icon": "🦘", "link": "https://mcpedl.com/?s=Parkour+Paradise"},
+        {"name": "سْكَايْ غْرِيدْ تْشَالِنْجْ", "icon": "🌤️", "link": "https://mcpedl.com/?s=SkyGrid+Challenge"},
+    ],
+}
 
 # ====================== 3. الريسوس باكات (ReSuS PaCk) ======================
-RESUS_PACKS = [
-    {"num": "⚡", "name": "ريسوس باك ذهبي PVP", "icon": "✨", "link": "https://mcpedl.com/gold-pvp-pack/"},
-    {"num": "⚡", "name": "ريسوس باك بنفسجي PVP", "icon": "💜", "link": "https://mcpedl.com/purple-pvp-pack/"},
-    {"num": "⚡", "name": "ريسوس باك الارنب", "icon": "🐇", "link": "https://mcpedl.com/rabbit-pack/"},
-    {"num": "⚡", "name": "ريسوس باك تقليل الاك", "icon": "📉", "link": "https://mcpedl.com/fps-boost-pack/"},
-    {"num": "⚡", "name": "ريسوس باك 32", "icon": "🔢", "link": "https://mcpedl.com/32x-pack/"},
-    {"num": "⚡", "name": "ريسوس باك القهوه", "icon": "☕", "link": "https://mcpedl.com/coffee-pack/"},
+RESUS_PACKS = {
+    "حزم PvP / أداء": [
+        {"name": "ريسوس باك ذهبي PVP", "icon": "✨", "link": "https://mcpedl.com/gold-pvp-pack/"},
+        {"name": "ريسوس باك بنفسجي PVP", "icon": "💜", "link": "https://mcpedl.com/purple-pvp-pack/"},
+        {"name": "ريسوس باك الارنب", "icon": "🐇", "link": "https://mcpedl.com/rabbit-pack/"},
+        {"name": "ريسوس باك تقليل الاك", "icon": "📉", "link": "https://mcpedl.com/fps-boost-pack/"},
+        {"name": "ريسوس باك 32", "icon": "🔢", "link": "https://mcpedl.com/32x-pack/"},
+        {"name": "ريسوس باك القهوه", "icon": "☕", "link": "https://mcpedl.com/coffee-pack/"},
+    ],
+    "حزم Realistic / HD": [
+        {"name": "✨ Vanilla RTX", "icon": "💎", "link": "https://dlcfun.com/vanilla-rtx"},
+        {"name": "🌆 Optimum Realism", "icon": "🏙️", "link": "https://www.curseforge.com/minecraft-bedrock/texture-packs/optimum-realism"},
+        {"name": "🎨 Bare Bones", "icon": "🦴", "link": "https://dlcfun.com/bare-bones"},
+        {"name": "🖼️ Default RTX", "icon": "🌟", "link": "https://for-minecraft.com/default-rtx-bedrock"},
+        {"name": "🌈 WhoCares Visuals", "icon": "🎭", "link": "https://www.curseforge.com/minecraft-bedrock/texture-packs/whocares-visuals"},
+    ],
+    "حزم Shaders / Vibrant Visuals": [
+        {"name": "❄️ Baku's Winter Rora", "icon": "☃️", "link": "https://mcpedl.com/bakus-winter-rora-shader/"},
+        {"name": "🌸 Kitty Dream 16x", "icon": "🎀", "link": "https://mcpedl.com/kitty-dream-16x/"},
+        {"name": "🌙 Two Moons", "icon": "🌕", "link": "https://modbay.org/two-moons-bedrock"},
+    ],
+    "حزم تحسينات / أدوات": [
+        {"name": "💡 FullBright (Night Vision)", "icon": "👁️", "link": "https://modbay.org/fullbright-night-vision"},
+        {"name": "🌊 Clear Aquatics", "icon": "💧", "link": "https://modbay.org/clear-aquatics"},
+        {"name": "🗺️ More Waypoint", "icon": "📍", "link": "https://mcpedl.com/more-waypoint/"},
+        {"name": "📦 X-Ray + Outlined Ores", "icon": "⛏️", "link": "https://mcpedl.com/x-ray-outlined-ores/"},
+    ],
+    "حزم أسلوب / مميزة": [
+        {"name": "🎭 Comic Realm", "icon": "💥", "link": "https://www.mc-mod.net/comic-realm-texture-pack/"},
+        {"name": "🏰 World Building", "icon": "🧱", "link": "https://www.mc-mod.net/world-building-texture-pack/"},
+        {"name": "🎨 Soartex Fanver", "icon": "🖌️", "link": "https://klpbbs.com/soartex-fanver/"},
+        {"name": "🔫 Tactical Arsenal", "icon": "🔫", "link": "https://www.mc-mod.net/tactical-arsenal-texture-pack/"},
+    ],
+}
 
-    # حزم Realistic / HD
-    {"name": "✨ Vanilla RTX", "emoji": "💎", "link": "https://dlcfun.com/vanilla-rtx"},
-    {"name": "🌆 Optimum Realism", "emoji": "🏙️", "link": "https://www.curseforge.com/minecraft-bedrock/texture-packs/optimum-realism"},
-    {"name": "🎨 Bare Bones", "emoji": "🦴", "link": "https://dlcfun.com/bare-bones"},
-    {"name": "🖼️ Default RTX", "emoji": "🌟", "link": "https://for-minecraft.com/default-rtx-bedrock"},
-    {"name": "🌈 WhoCares Visuals", "emoji": "🎭", "link": "https://www.curseforge.com/minecraft-bedrock/texture-packs/whocares-visuals"},
-
-    # حزم PvP / أداء
-    {"name": "⚔️ RedPack 16x", "emoji": "🔥", "link": "https://mcpedl.com/redpack-16x/"},
-    {"name": "🐱 +FPS White Cat 16x", "emoji": "🐈", "link": "https://mcpedl.com/fps-white-cat-16x/"},
-    {"name": "🎯 Most Advantage Essentials", "emoji": "⚡", "link": "https://modbay.org/most-advantage-essentials"},
-    {"name": "📈 Metaanie: Vanilla (FPS+)", "emoji": "🚀", "link": "https://www.curseforge.com/minecraft-bedrock/texture-packs/metaanie-vanilla"},
-
-    # حزم Shaders / Vibrant Visuals
-    {"name": "❄️ Baku's Winter Rora", "emoji": "☃️", "link": "https://mcpedl.com/bakus-winter-rora-shader/"},
-    {"name": "🌸 Kitty Dream 16x", "emoji": "🎀", "link": "https://mcpedl.com/kitty-dream-16x/"},
-    {"name": "🌙 Two Moons", "emoji": "🌕", "link": "https://modbay.org/two-moons-bedrock"},
-
-    # حزم تحسينات / أدوات
-    {"name": "💡 FullBright (Night Vision)", "emoji": "👁️", "link": "https://modbay.org/fullbright-night-vision"},
-    {"name": "🌊 Clear Aquatics", "emoji": "💧", "link": "https://modbay.org/clear-aquatics"},
-    {"name": "🗺️ More Waypoint", "emoji": "📍", "link": "https://mcpedl.com/more-waypoint/"},
-    {"name": "📦 X-Ray + Outlined Ores", "emoji": "⛏️", "link": "https://mcpedl.com/x-ray-outlined-ores/"},
-
-    # حزم أسلوب / مميزة
-    {"name": "🎭 Comic Realm", "emoji": "💥", "link": "https://www.mc-mod.net/comic-realm-texture-pack/"},
-    {"name": "🏰 World Building", "emoji": "🧱", "link": "https://www.mc-mod.net/world-building-texture-pack/"},
-    {"name": "🎨 Soartex Fanver", "emoji": "🖌️", "link": "https://klpbbs.com/soartex-fanver/"},
-    {"name": "🔫 Tactical Arsenal", "emoji": "🔫", "link": "https://www.mc-mod.net/tactical-arsenal-texture-pack/"},
-]
-
-# ====================== 4. الشادرات (Shaders) ======================
-SHADERS = [
+# ====================== 4. الشادرات (Shaders) - معدلة ======================
+# قائمة جميع الشادرات الخام (بدون تصنيف)
+SHADERS_RAW = [
     {"num": "🌞", "name": "شادر ESBE 2G", "icon": "🌈", "link": "https://mcpedl.com/esbe-2g-shader/"},
     {"num": "🌞", "name": "شادر Newb X", "icon": "🌅", "link": "https://mcpedl.com/newb-x-shader/"},
-        # ---------- SEUS PE Series ----------
     {"name": "SEUS PE", "link": "https://mcpedl.com/seus-pe-shader/", "description": "🌅 شادر واقعي فائق الجودة.", "emoji": "🌅"},
     {"name": "SEUS PE Lite", "link": "https://mcpedl.com/seus-pe-lite/", "description": "🌤️ نسخة خفيفة من SEUS.", "emoji": "🌤️"},
     {"name": "SEUS PE Renewed", "link": "https://mcpedl.com/seus-pe-renewed/", "description": "☀️ إصدار محدث بأداء أفضل.", "emoji": "☀️"},
     {"name": "SEUS PE v11", "link": "https://mcpedl.com/seus-pe-v11/", "description": "🌇 الإصدار 11 من SEUS PE.", "emoji": "🌇"},
     {"name": "SEUS PTGI E12", "link": "https://mcpedl.com/seus-ptgi-e12/", "description": "✨ إضاءة متقدمة وتتبع أشعة.", "emoji": "✨"},
-
-    # ---------- ESTN Shaders ----------
     {"name": "ESTN Shaders v1", "link": "https://mcpedl.com/estn-shaders-v1/", "description": "🎨 إضاءة ناعمة وألوان جميلة.", "emoji": "🎨"},
     {"name": "ESTN Shaders v2", "link": "https://mcpedl.com/estn-shaders-v2/", "description": "🖌️ تحسينات على الظلال.", "emoji": "🖌️"},
     {"name": "ESTN Shaders v3", "link": "https://mcpedl.com/estn-shaders-v3/", "description": "🌈 أداء أفضل وتوافق أوسع.", "emoji": "🌈"},
@@ -325,480 +316,292 @@ SHADERS = [
     {"name": "ESTN Shaders v8", "link": "https://mcpedl.com/estn-shaders-v8/", "description": "🌊 إضاءة محيطية.", "emoji": "🌊"},
     {"name": "ESTN Shaders v9", "link": "https://mcpedl.com/estn-shaders-v9/", "description": "⚡ نسخة محسنة للأجهزة الضعيفة.", "emoji": "⚡"},
     {"name": "ESTN Shaders v10", "link": "https://mcpedl.com/estn-shaders-v10/", "description": "🌟 أحدث إصدار بجودة عالية.", "emoji": "🌟"},
-
-    # ---------- BSBE Shaders ----------
     {"name": "BSBE Shader", "link": "https://mcpedl.com/bsbe-shader/", "description": "🍃 شادر خفيف وسريع.", "emoji": "🍃"},
     {"name": "BSBE Shader Lite", "link": "https://mcpedl.com/bsbe-shader-lite/", "description": "🌱 أخف نسخة للأجهزة الضعيفة.", "emoji": "🌱"},
     {"name": "BSBE Shader Ultra", "link": "https://mcpedl.com/bsbe-shader-ultra/", "description": "💎 جودة قصوى مع أداء ممتاز.", "emoji": "💎"},
     {"name": "BSBE Shader v2", "link": "https://mcpedl.com/bsbe-shader-v2/", "description": "🍀 إصدار محدث بتحسينات.", "emoji": "🍀"},
     {"name": "BSBE Shader v3", "link": "https://mcpedl.com/bsbe-shader-v3/", "description": "🌲 أحدث إصدار من BSBE.", "emoji": "🌲"},
-
-    # ---------- Haptic Shader ----------
     {"name": "Haptic Shader", "link": "https://mcpedl.com/haptic-shader/", "description": "🌆 ألوان دافئة وإضاءة جميلة.", "emoji": "🌆"},
     {"name": "Haptic Shader Lite", "link": "https://mcpedl.com/haptic-shader-lite/", "description": "🌃 نسخة خفيفة.", "emoji": "🌃"},
     {"name": "Haptic Shader Pro", "link": "https://mcpedl.com/haptic-shader-pro/", "description": "🏙️ ميزات متقدمة.", "emoji": "🏙️"},
     {"name": "Haptic Shader v2", "link": "https://mcpedl.com/haptic-shader-v2/", "description": "🌉 الإصدار الثاني.", "emoji": "🌉"},
-
-    # ---------- Zebra Shader ----------
     {"name": "Zebra Shader", "link": "https://mcpedl.com/zebra-shader/", "description": "🦓 تباين عالي وألوان واضحة.", "emoji": "🦓"},
     {"name": "Zebra Shader Lite", "link": "https://mcpedl.com/zebra-shader-lite/", "description": "⚪ خفيف وسريع.", "emoji": "⚪"},
     {"name": "Zebra Shader Ultra", "link": "https://mcpedl.com/zebra-shader-ultra/", "description": "🔳 جودة عالية جدًا.", "emoji": "🔳"},
     {"name": "Zebra Shader v2", "link": "https://mcpedl.com/zebra-shader-v2/", "description": "⬜ إصدار محسّن.", "emoji": "⬜"},
     {"name": "Zebra Shader v3", "link": "https://mcpedl.com/zebra-shader-v3/", "description": "⬛ أحدث إصدار.", "emoji": "⬛"},
-
-    # ---------- Newb Shader ----------
     {"name": "Newb Shader", "link": "https://mcpedl.com/newb-shader/", "description": "🆕 مثالي للمبتدئين.", "emoji": "🆕"},
     {"name": "Newb Shader XL", "link": "https://mcpedl.com/newb-shader-xl/", "description": "🔠 نسخة موسعة.", "emoji": "🔠"},
     {"name": "Newb Shader Pro", "link": "https://mcpedl.com/newb-shader-pro/", "description": "💼 احترافي.", "emoji": "💼"},
     {"name": "Newb Shader v2", "link": "https://mcpedl.com/newb-shader-v2/", "description": "🆒 إصدار ثاني.", "emoji": "🆒"},
-
-    # ---------- Source Shader ----------
     {"name": "Source Shader", "link": "https://mcpedl.com/source-shader/", "description": "🔆 إضاءة واقعية.", "emoji": "🔆"},
     {"name": "Source Shader Lite", "link": "https://mcpedl.com/source-shader-lite/", "description": "☀️ نسخة خفيفة.", "emoji": "☀️"},
     {"name": "Source Shader Ultra", "link": "https://mcpedl.com/source-shader-ultra/", "description": "🌞 جودة فائقة.", "emoji": "🌞"},
     {"name": "Source Shader v2", "link": "https://mcpedl.com/source-shader-v2/", "description": "🔅 إصدار محسّن.", "emoji": "🔅"},
-
-    # ---------- Continuum Shader ----------
     {"name": "Continuum Shader", "link": "https://mcpedl.com/continuum-shader/", "description": "🎬 إضاءة سينمائية.", "emoji": "🎬"},
     {"name": "Continuum Shader Lite", "link": "https://mcpedl.com/continuum-shader-lite/", "description": "🎞️ خفيف.", "emoji": "🎞️"},
     {"name": "Continuum Shader Ultra", "link": "https://mcpedl.com/continuum-shader-ultra/", "description": "📽️ أعلى جودة.", "emoji": "📽️"},
     {"name": "Continuum Shader v2", "link": "https://mcpedl.com/continuum-shader-v2/", "description": "🎥 إصدار جديد.", "emoji": "🎥"},
-
-    # ---------- Sildur's Shaders (Bedrock) ----------
     {"name": "Sildur's Vibrant Shaders", "link": "https://mcpedl.com/sildurs-vibrant-shaders-bedrock/", "description": "🌈 ألوان نابضة بالحياة.", "emoji": "🌈"},
     {"name": "Sildur's Vibrant Lite", "link": "https://mcpedl.com/sildurs-vibrant-lite/", "description": "🌸 نسخة خفيفة.", "emoji": "🌸"},
     {"name": "Sildur's Vibrant Medium", "link": "https://mcpedl.com/sildurs-vibrant-medium/", "description": "💮 توازن بين الجودة والأداء.", "emoji": "💮"},
-
-    # ---------- Chocapic13 Shaders (Bedrock) ----------
     {"name": "Chocapic13 Shaders", "link": "https://mcpedl.com/chocapic13-shaders-bedrock/", "description": "🌳 إضاءة طبيعية.", "emoji": "🌳"},
     {"name": "Chocapic13 Lite", "link": "https://mcpedl.com/chocapic13-lite/", "description": "🌲 خفيف.", "emoji": "🌲"},
     {"name": "Chocapic13 High", "link": "https://mcpedl.com/chocapic13-high/", "description": "🌴 جودة عالية.", "emoji": "🌴"},
-
-    # ---------- BSL Shaders (Bedrock) ----------
     {"name": "BSL Shaders", "link": "https://mcpedl.com/bsl-shaders-bedrock/", "description": "🌄 شادر شهير بواقعية.", "emoji": "🌄"},
     {"name": "BSL Shaders Lite", "link": "https://mcpedl.com/bsl-shaders-lite/", "description": "🏞️ نسخة خفيفة.", "emoji": "🏞️"},
     {"name": "BSL Shaders Ultra", "link": "https://mcpedl.com/bsl-shaders-ultra/", "description": "🗻 أقصى جودة.", "emoji": "🗻"},
-
-    # ---------- KUDA Shaders (Bedrock) ----------
     {"name": "KUDA Shaders", "link": "https://mcpedl.com/kuda-shaders-bedrock/", "description": "🔥 إضاءة دافئة.", "emoji": "🔥"},
     {"name": "KUDA Shaders Lite", "link": "https://mcpedl.com/kuda-shaders-lite/", "description": "🕯️ خفيف.", "emoji": "🕯️"},
     {"name": "KUDA Shaders Ultra", "link": "https://mcpedl.com/kuda-shaders-ultra/", "description": "💡 جودة عالية.", "emoji": "💡"},
-
-    # ---------- Beyond Belief Shaders ----------
     {"name": "Beyond Belief Shaders", "link": "https://mcpedl.com/beyond-belief-shaders/", "description": "🌀 ألوان خيالية.", "emoji": "🌀"},
     {"name": "Beyond Belief Lite", "link": "https://mcpedl.com/beyond-belief-lite/", "description": "🎐 نسخة خفيفة.", "emoji": "🎐"},
-
-    # ---------- Evident Shaders ----------
     {"name": "Evident Shaders", "link": "https://mcpedl.com/evident-shaders/", "description": "🔍 ظلال واضحة.", "emoji": "🔍"},
     {"name": "Evident Shaders v2", "link": "https://mcpedl.com/evident-shaders-v2/", "description": "🔎 إصدار محسّن.", "emoji": "🔎"},
-
-    # ---------- Natural Mystic Shaders ----------
     {"name": "Natural Mystic Shaders", "link": "https://mcpedl.com/natural-mystic-shaders/", "description": "🌿 طبيعة ساحرة.", "emoji": "🌿"},
     {"name": "Natural Mystic v2", "link": "https://mcpedl.com/natural-mystic-shaders-v2/", "description": "🍃 إصدار جديد.", "emoji": "🍃"},
-
-    # ---------- Reality Shader ----------
     {"name": "Reality Shader", "link": "https://mcpedl.com/reality-shader/", "description": "🌐 واقعية مذهلة.", "emoji": "🌐"},
     {"name": "Reality Shader v2", "link": "https://mcpedl.com/reality-shader-v2/", "description": "🌍 إصدار ثاني.", "emoji": "🌍"},
-
-    # ---------- Enhanced Default ----------
     {"name": "Enhanced Default Shader", "link": "https://mcpedl.com/enhanced-default-shader/", "description": "📦 تحسين للشكل الافتراضي.", "emoji": "📦"},
-
-    # ---------- Bare Bones ----------
     {"name": "Bare Bones Shader", "link": "https://mcpedl.com/bare-bones-shader/", "description": "🦴 بسيط ونظيف.", "emoji": "🦴"},
-
-    # ---------- Mizuno's 16x ----------
     {"name": "Mizuno's 16x Shader", "link": "https://mcpedl.com/mizunos-16x-shader/", "description": "🎏 ملمس ناعم مع إضاءة.", "emoji": "🎏"},
-
-    # ---------- Stay True ----------
     {"name": "Stay True Shader", "link": "https://mcpedl.com/stay-true-shader/", "description": "🕊️ ألوان هادئة.", "emoji": "🕊️"},
-
-    # ---------- ProjectLUMA ----------
     {"name": "ProjectLUMA Shader", "link": "https://mcpedl.com/projectluma-shader/", "description": "🎇 إضاءة سينمائية.", "emoji": "🎇"},
     {"name": "ProjectLUMA Lite", "link": "https://mcpedl.com/projectluma-lite/", "description": "✨ نسخة خفيفة.", "emoji": "✨"},
-
-    # ---------- AstraLex Shaders ----------
     {"name": "AstraLex Shaders", "link": "https://mcpedl.com/astralex-shaders/", "description": "🌌 مزيج من عدة شادرات.", "emoji": "🌌"},
     {"name": "AstraLex Lite", "link": "https://mcpedl.com/astralex-lite/", "description": "☄️ خفيف.", "emoji": "☄️"},
-
-    # ---------- Voyager Shader ----------
     {"name": "Voyager Shader", "link": "https://mcpedl.com/voyager-shader/", "description": "🚀 استكشاف بصري.", "emoji": "🚀"},
     {"name": "Voyager v2", "link": "https://mcpedl.com/voyager-shader-v2/", "description": "🛸 إصدار ثاني.", "emoji": "🛸"},
-
-    # ---------- Creeper Shader ----------
     {"name": "Creeper Shader", "link": "https://mcpedl.com/creeper-shader/", "description": "💚 ألوان زاهية.", "emoji": "💚"},
     {"name": "Creeper Shader Lite", "link": "https://mcpedl.com/creeper-shader-lite/", "description": "🍏 خفيف.", "emoji": "🍏"},
-
-    # ---------- Ultra Shader ----------
     {"name": "Ultra Shader", "link": "https://mcpedl.com/ultra-shader/", "description": "🔷 جودة فائقة.", "emoji": "🔷"},
     {"name": "Ultra Shader v2", "link": "https://mcpedl.com/ultra-shader-v2/", "description": "🔶 إصدار محسّن.", "emoji": "🔶"},
-
-    # ---------- Kappa Shader ----------
     {"name": "Kappa Shader", "link": "https://mcpedl.com/kappa-shader/", "description": "🔥 إضاءة دافئة.", "emoji": "🔥"},
     {"name": "Kappa Shader v2", "link": "https://mcpedl.com/kappa-shader-v2/", "description": "☀️ نسخة جديدة.", "emoji": "☀️"},
-
-    # ---------- RRe36's Shaders ----------
     {"name": "RRe36's Kappa Shader", "link": "https://mcpedl.com/rre36-kappa-shader/", "description": "🌋 من مبتكر Kappa.", "emoji": "🌋"},
     {"name": "RRe36's ProjectLUMA", "link": "https://mcpedl.com/rre36-projectluma/", "description": "🎆 إضاءة سينمائية.", "emoji": "🎆"},
-
-    # ---------- SORA Shaders ----------
     {"name": "SORA Shaders", "link": "https://mcpedl.com/sora-shaders/", "description": "🌤️ سماء جميلة.", "emoji": "🌤️"},
     {"name": "SORA Shaders v2", "link": "https://mcpedl.com/sora-shaders-v2/", "description": "⛅ إصدار ثاني.", "emoji": "⛅"},
     {"name": "SORA Lite", "link": "https://mcpedl.com/sora-shaders-lite/", "description": "🌥️ نسخة خفيفة.", "emoji": "🌥️"},
-
-    # ---------- Vanilla Plus Shader ----------
     {"name": "Vanilla Plus Shader", "link": "https://mcpedl.com/vanilla-plus-shader/", "description": "🍦 تحسين للفانيليا.", "emoji": "🍦"},
     {"name": "Vanilla Plus v2", "link": "https://mcpedl.com/vanilla-plus-shader-v2/", "description": "🍨 إصدار جديد.", "emoji": "🍨"},
-
-    # ---------- Simple Shader ----------
     {"name": "Simple Shader", "link": "https://mcpedl.com/simple-shader/", "description": "⚪ بسيط وسريع.", "emoji": "⚪"},
     {"name": "Simple Shader v2", "link": "https://mcpedl.com/simple-shader-v2/", "description": "⬜ إصدار ثاني.", "emoji": "⬜"},
-
-    # ---------- Pixel Perfect Shader ----------
     {"name": "Pixel Perfect Shader", "link": "https://mcpedl.com/pixel-perfect-shader/", "description": "🔲 دقة بكسلات.", "emoji": "🔲"},
     {"name": "Pixel Perfect v2", "link": "https://mcpedl.com/pixel-perfect-shader-v2/", "description": "🔳 نسخة محسنة.", "emoji": "🔳"},
-
-    # ---------- Retro Shader ----------
     {"name": "Retro Shader", "link": "https://mcpedl.com/retro-shader/", "description": "📼 أسلوب قديم.", "emoji": "📼"},
     {"name": "Retro v2", "link": "https://mcpedl.com/retro-shader-v2/", "description": "📺 إصدار جديد.", "emoji": "📺"},
-
-    # ---------- CRUSH Shaders ----------
     {"name": "CRUSH Shaders", "link": "https://mcpedl.com/crush-shaders/", "description": "💥 ألوان قوية.", "emoji": "💥"},
     {"name": "CRUSH Lite", "link": "https://mcpedl.com/crush-shaders-lite/", "description": "🎯 خفيف.", "emoji": "🎯"},
-
-    # ---------- ESBE Shaders ----------
     {"name": "ESBE 2G Shader", "link": "https://mcpedl.com/esbe-2g-shader/", "description": "📱 الجيل الثاني.", "emoji": "📱"},
     {"name": "ESBE 3G Shader", "link": "https://mcpedl.com/esbe-3g-shader/", "description": "📲 الجيل الثالث.", "emoji": "📲"},
     {"name": "ESBE 3G Lite", "link": "https://mcpedl.com/esbe-3g-lite/", "description": "🔋 نسخة خفيفة.", "emoji": "🔋"},
-
-    # ---------- YSS Shader ----------
     {"name": "YSS Shader", "link": "https://mcpedl.com/yss-shader/", "description": "🌙 إضاءة ناعمة.", "emoji": "🌙"},
     {"name": "YSS v2", "link": "https://mcpedl.com/yss-shader-v2/", "description": "🌛 إصدار ثاني.", "emoji": "🌛"},
     {"name": "YSS Lite", "link": "https://mcpedl.com/yss-shader-lite/", "description": "🌜 خفيف.", "emoji": "🌜"},
-
-    # ---------- Vibrant Shaders (Bedrock) ----------
     {"name": "Vibrant Shaders", "link": "https://mcpedl.com/vibrant-shaders-bedrock/", "description": "🎨 ألوان نابضة.", "emoji": "🎨"},
     {"name": "Vibrant Lite", "link": "https://mcpedl.com/vibrant-shaders-lite/", "description": "🖍️ نسخة خفيفة.", "emoji": "🖍️"},
-
-    # ---------- Dramatic Skys ----------
     {"name": "Dramatic Skys Shader", "link": "https://mcpedl.com/dramatic-skys-shader/", "description": "🌇 سماء درامية.", "emoji": "🌇"},
     {"name": "Dramatic Skys v2", "link": "https://mcpedl.com/dramatic-skys-shader-v2/", "description": "🌆 إصدار جديد.", "emoji": "🌆"},
     {"name": "Dramatic Skys Lite", "link": "https://mcpedl.com/dramatic-skys-lite/", "description": "🌃 خفيف.", "emoji": "🌃"},
-
-    # ---------- Enhanced Biomes ----------
     {"name": "Enhanced Biomes Shader", "link": "https://mcpedl.com/enhanced-biomes-shader/", "description": "🌲 تحسين المناطق الحيوية.", "emoji": "🌲"},
     {"name": "Enhanced Biomes v2", "link": "https://mcpedl.com/enhanced-biomes-shader-v2/", "description": "🌳 إصدار ثاني.", "emoji": "🌳"},
-
-    # ---------- Realistico ----------
     {"name": "Realistico Shader", "link": "https://mcpedl.com/realistico-shader/", "description": "🏞️ واقعية عالية.", "emoji": "🏞️"},
     {"name": "Realistico v2", "link": "https://mcpedl.com/realistico-shader-v2/", "description": "🌄 نسخة محسنة.", "emoji": "🌄"},
     {"name": "Realistico Lite", "link": "https://mcpedl.com/realistico-lite/", "description": "🌅 خفيف.", "emoji": "🌅"},
-
-    # ---------- Pinnacle ----------
     {"name": "Pinnacle Shader", "link": "https://mcpedl.com/pinnacle-shader/", "description": "🏔️ قمّة الجودة.", "emoji": "🏔️"},
     {"name": "Pinnacle v2", "link": "https://mcpedl.com/pinnacle-shader-v2/", "description": "⛰️ إصدار جديد.", "emoji": "⛰️"},
-
-    # ---------- Bliss ----------
     {"name": "Bliss Shader", "link": "https://mcpedl.com/bliss-shader/", "description": "😊 نعيم بصري.", "emoji": "😊"},
     {"name": "Bliss v2", "link": "https://mcpedl.com/bliss-shader-v2/", "description": "😌 إصدار ثاني.", "emoji": "😌"},
-
-    # ---------- Nostalgia ----------
     {"name": "Nostalgia Shader", "link": "https://mcpedl.com/nostalgia-shader/", "description": "📻 ذكريات الماضي.", "emoji": "📻"},
     {"name": "Nostalgia v2", "link": "https://mcpedl.com/nostalgia-shader-v2/", "description": "🕰️ إصدار جديد.", "emoji": "🕰️"},
     {"name": "Nostalgia Lite", "link": "https://mcpedl.com/nostalgia-shader-lite/", "description": "⏳ خفيف.", "emoji": "⏳"},
-
-    # ---------- Triliton's Shaders ----------
     {"name": "Triliton's Shaders", "link": "https://mcpedl.com/trilitons-shaders/", "description": "🔱 إضاءة فريدة.", "emoji": "🔱"},
     {"name": "Triliton's v2", "link": "https://mcpedl.com/trilitons-shaders-v2/", "description": "⚜️ إصدار ثاني.", "emoji": "⚜️"},
     {"name": "Triliton's v3", "link": "https://mcpedl.com/trilitons-shaders-v3/", "description": "🔰 أحدث إصدار.", "emoji": "🔰"},
-
-    # ---------- Soritong ----------
     {"name": "Soritong Shader", "link": "https://mcpedl.com/soritong-shader/", "description": "🍂 ألوان دافئة.", "emoji": "🍂"},
     {"name": "Soritong v2", "link": "https://mcpedl.com/soritong-shader-v2/", "description": "🍁 إصدار جديد.", "emoji": "🍁"},
-
-    # ---------- Pampas ----------
     {"name": "Pampas Shader", "link": "https://mcpedl.com/pampas-shader/", "description": "🌾 سهول جميلة.", "emoji": "🌾"},
     {"name": "Pampas v2", "link": "https://mcpedl.com/pampas-shader-v2/", "description": "🌻 نسخة محسنة.", "emoji": "🌻"},
-
-    # ---------- Llama ----------
     {"name": "Llama Shader", "link": "https://mcpedl.com/llama-shader/", "description": "🦙 خفيف وسريع.", "emoji": "🦙"},
     {"name": "Llama v2", "link": "https://mcpedl.com/llama-shader-v2/", "description": "🐪 إصدار ثاني.", "emoji": "🐪"},
-
-    # ---------- Mellow ----------
     {"name": "Mellow Shader", "link": "https://mcpedl.com/mellow-shader/", "description": "🍃 ألوان هادئة.", "emoji": "🍃"},
     {"name": "Mellow v2", "link": "https://mcpedl.com/mellow-shader-v2/", "description": "🌿 نسخة جديدة.", "emoji": "🌿"},
-
-    # ---------- Sakura ----------
     {"name": "Sakura Shader", "link": "https://mcpedl.com/sakura-shader/", "description": "🌸 أجواء الربيع.", "emoji": "🌸"},
     {"name": "Sakura v2", "link": "https://mcpedl.com/sakura-shader-v2/", "description": "💮 إصدار ثاني.", "emoji": "💮"},
     {"name": "Sakura Lite", "link": "https://mcpedl.com/sakura-shader-lite/", "description": "🌺 خفيف.", "emoji": "🌺"},
-
-    # ---------- Zenith ----------
     {"name": "Zenith Shader", "link": "https://mcpedl.com/zenith-shader/", "description": "🔝 ذروة الإضاءة.", "emoji": "🔝"},
     {"name": "Zenith v2", "link": "https://mcpedl.com/zenith-shader-v2/", "description": "🏆 إصدار جديد.", "emoji": "🏆"},
-
-    # ---------- Fusion ----------
     {"name": "Fusion Shader", "link": "https://mcpedl.com/fusion-shader/", "description": "⚛️ دمج بين الشادرات.", "emoji": "⚛️"},
     {"name": "Fusion v2", "link": "https://mcpedl.com/fusion-shader-v2/", "description": "☯️ نسخة محسنة.", "emoji": "☯️"},
-
-    # ---------- Mystic ----------
     {"name": "Mystic Shader", "link": "https://mcpedl.com/mystic-shader/", "description": "🔮 غموض وجمال.", "emoji": "🔮"},
     {"name": "Mystic v2", "link": "https://mcpedl.com/mystic-shader-v2/", "description": "🪄 إصدار ثاني.", "emoji": "🪄"},
     {"name": "Mystic Lite", "link": "https://mcpedl.com/mystic-shader-lite/", "description": "✨ خفيف.", "emoji": "✨"},
-
-    # ---------- Radiant ----------
     {"name": "Radiant Shader", "link": "https://mcpedl.com/radiant-shader/", "description": "☀️ إشراق.", "emoji": "☀️"},
     {"name": "Radiant v2", "link": "https://mcpedl.com/radiant-shader-v2/", "description": "🌞 إصدار جديد.", "emoji": "🌞"},
-
-    # ---------- Aurora ----------
     {"name": "Aurora Shader", "link": "https://mcpedl.com/aurora-shader/", "description": "🌌 أضواء الشفق.", "emoji": "🌌"},
     {"name": "Aurora v2", "link": "https://mcpedl.com/aurora-shader-v2/", "description": "🌠 نسخة محسنة.", "emoji": "🌠"},
-
-    # ---------- Eclipse ----------
     {"name": "Eclipse Shader", "link": "https://mcpedl.com/eclipse-shader/", "description": "🌑 كسوف جميل.", "emoji": "🌑"},
     {"name": "Eclipse v2", "link": "https://mcpedl.com/eclipse-shader-v2/", "description": "🌘 إصدار ثاني.", "emoji": "🌘"},
     {"name": "Eclipse Lite", "link": "https://mcpedl.com/eclipse-shader-lite/", "description": "🌗 خفيف.", "emoji": "🌗"},
-
-    # ---------- Nebula ----------
     {"name": "Nebula Shader", "link": "https://mcpedl.com/nebula-shader/", "description": "🌫️ سديم.", "emoji": "🌫️"},
     {"name": "Nebula v2", "link": "https://mcpedl.com/nebula-shader-v2/", "description": "☁️ إصدار جديد.", "emoji": "☁️"},
-
-    # ---------- Cosmic ----------
     {"name": "Cosmic Shader", "link": "https://mcpedl.com/cosmic-shader/", "description": "🪐 كوني.", "emoji": "🪐"},
     {"name": "Cosmic v2", "link": "https://mcpedl.com/cosmic-shader-v2/", "description": "🌌 نسخة محسنة.", "emoji": "🌌"},
-
-    # ---------- Solar ----------
     {"name": "Solar Shader", "link": "https://mcpedl.com/solar-shader/", "description": "☀️ شمسي.", "emoji": "☀️"},
     {"name": "Solar v2", "link": "https://mcpedl.com/solar-shader-v2/", "description": "🌞 إصدار ثاني.", "emoji": "🌞"},
-
-    # ---------- Lunar ----------
     {"name": "Lunar Shader", "link": "https://mcpedl.com/lunar-shader/", "description": "🌙 قمري.", "emoji": "🌙"},
     {"name": "Lunar v2", "link": "https://mcpedl.com/lunar-shader-v2/", "description": "🌛 نسخة جديدة.", "emoji": "🌛"},
-
-    # ---------- Stellar ----------
     {"name": "Stellar Shader", "link": "https://mcpedl.com/stellar-shader/", "description": "⭐ نجمي.", "emoji": "⭐"},
     {"name": "Stellar v2", "link": "https://mcpedl.com/stellar-shader-v2/", "description": "🌟 إصدار ثاني.", "emoji": "🌟"},
-
-    # ---------- Galaxy ----------
     {"name": "Galaxy Shader", "link": "https://mcpedl.com/galaxy-shader/", "description": "🌌 مجرة.", "emoji": "🌌"},
     {"name": "Galaxy v2", "link": "https://mcpedl.com/galaxy-shader-v2/", "description": "🌠 نسخة محسنة.", "emoji": "🌠"},
-
-    # ---------- Photon ----------
     {"name": "Photon Shader", "link": "https://mcpedl.com/photon-shader/", "description": "💡 فوتونات.", "emoji": "💡"},
     {"name": "Photon v2", "link": "https://mcpedl.com/photon-shader-v2/", "description": "🔦 إصدار جديد.", "emoji": "🔦"},
-
-    # ---------- Quantum ----------
     {"name": "Quantum Shader", "link": "https://mcpedl.com/quantum-shader/", "description": "⚛️ كمي.", "emoji": "⚛️"},
     {"name": "Quantum v2", "link": "https://mcpedl.com/quantum-shader-v2/", "description": "🔬 نسخة ثانية.", "emoji": "🔬"},
-
-    # ---------- Ion ----------
     {"name": "Ion Shader", "link": "https://mcpedl.com/ion-shader/", "description": "⚡ أيونات.", "emoji": "⚡"},
     {"name": "Ion v2", "link": "https://mcpedl.com/ion-shader-v2/", "description": "🔋 إصدار جديد.", "emoji": "🔋"},
-
-    # ---------- Plasma ----------
     {"name": "Plasma Shader", "link": "https://mcpedl.com/plasma-shader/", "description": "🔥 بلازما.", "emoji": "🔥"},
     {"name": "Plasma v2", "link": "https://mcpedl.com/plasma-shader-v2/", "description": "💥 نسخة محسنة.", "emoji": "💥"},
-
-    # ---------- Pulse ----------
     {"name": "Pulse Shader", "link": "https://mcpedl.com/pulse-shader/", "description": "❤️ نبض.", "emoji": "❤️"},
     {"name": "Pulse v2", "link": "https://mcpedl.com/pulse-shader-v2/", "description": "💓 إصدار ثاني.", "emoji": "💓"},
-
-    # ---------- Wave ----------
     {"name": "Wave Shader", "link": "https://mcpedl.com/wave-shader/", "description": "🌊 موجات.", "emoji": "🌊"},
     {"name": "Wave v2", "link": "https://mcpedl.com/wave-shader-v2/", "description": "🏄 نسخة جديدة.", "emoji": "🏄"},
-
-    # ---------- Flux ----------
     {"name": "Flux Shader", "link": "https://mcpedl.com/flux-shader/", "description": "🌀 تدفق.", "emoji": "🌀"},
     {"name": "Flux v2", "link": "https://mcpedl.com/flux-shader-v2/", "description": "🌪️ إصدار ثاني.", "emoji": "🌪️"},
-
-    # ---------- Dynamo ----------
     {"name": "Dynamo Shader", "link": "https://mcpedl.com/dynamo-shader/", "description": "⚙️ دينامو.", "emoji": "⚙️"},
     {"name": "Dynamo v2", "link": "https://mcpedl.com/dynamo-shader-v2/", "description": "🔩 نسخة محسنة.", "emoji": "🔩"},
-
-    # ---------- Volt ----------
     {"name": "Volt Shader", "link": "https://mcpedl.com/volt-shader/", "description": "🔌 فولت.", "emoji": "🔌"},
     {"name": "Volt v2", "link": "https://mcpedl.com/volt-shader-v2/", "description": "⚡ إصدار جديد.", "emoji": "⚡"},
-
-    # ---------- Core ----------
     {"name": "Core Shader", "link": "https://mcpedl.com/core-shader/", "description": "💠 نواة.", "emoji": "💠"},
     {"name": "Core v2", "link": "https://mcpedl.com/core-shader-v2/", "description": "🔷 نسخة ثانية.", "emoji": "🔷"},
-
-    # ---------- Titan ----------
     {"name": "Titan Shader", "link": "https://mcpedl.com/titan-shader/", "description": "🗿 عملاق.", "emoji": "🗿"},
     {"name": "Titan v2", "link": "https://mcpedl.com/titan-shader-v2/", "description": "🏛️ إصدار جديد.", "emoji": "🏛️"},
-
-    # ---------- Colossus ----------
     {"name": "Colossus Shader", "link": "https://mcpedl.com/colossus-shader/", "description": "🗽 تمثال ضخم.", "emoji": "🗽"},
     {"name": "Colossus v2", "link": "https://mcpedl.com/colossus-shader-v2/", "description": "🏰 نسخة محسنة.", "emoji": "🏰"},
-
-    # ---------- Atlas ----------
     {"name": "Atlas Shader", "link": "https://mcpedl.com/atlas-shader/", "description": "🌍 أطلس.", "emoji": "🌍"},
     {"name": "Atlas v2", "link": "https://mcpedl.com/atlas-shader-v2/", "description": "🌎 إصدار ثاني.", "emoji": "🌎"},
-
-    # ---------- Hyper ----------
     {"name": "Hyper Shader", "link": "https://mcpedl.com/hyper-shader/", "description": "🚀 فائق السرعة.", "emoji": "🚀"},
     {"name": "Hyper v2", "link": "https://mcpedl.com/hyper-shader-v2/", "description": "🛸 نسخة جديدة.", "emoji": "🛸"},
-
-    # ---------- Extreme ----------
     {"name": "Extreme Shader", "link": "https://mcpedl.com/extreme-shader/", "description": "⚠️ متطرف.", "emoji": "⚠️"},
     {"name": "Extreme v2", "link": "https://mcpedl.com/extreme-shader-v2/", "description": "☣️ إصدار ثاني.", "emoji": "☣️"},
-
-    # ---------- Pro ----------
     {"name": "Pro Shader", "link": "https://mcpedl.com/pro-shader/", "description": "💼 احترافي.", "emoji": "💼"},
     {"name": "Pro v2", "link": "https://mcpedl.com/pro-shader-v2/", "description": "📈 نسخة محسنة.", "emoji": "📈"},
-
-    # ---------- Elite ----------
     {"name": "Elite Shader", "link": "https://mcpedl.com/elite-shader/", "description": "👑 نخبة.", "emoji": "👑"},
     {"name": "Elite v2", "link": "https://mcpedl.com/elite-shader-v2/", "description": "💎 إصدار جديد.", "emoji": "💎"},
-
-    # ---------- Prime ----------
     {"name": "Prime Shader", "link": "https://mcpedl.com/prime-shader/", "description": "🔑 أساسي.", "emoji": "🔑"},
     {"name": "Prime v2", "link": "https://mcpedl.com/prime-shader-v2/", "description": "🗝️ نسخة ثانية.", "emoji": "🗝️"},
-
-    # ---------- Max ----------
     {"name": "Max Shader", "link": "https://mcpedl.com/max-shader/", "description": "📊 الحد الأقصى.", "emoji": "📊"},
     {"name": "Max v2", "link": "https://mcpedl.com/max-shader-v2/", "description": "📈 إصدار جديد.", "emoji": "📈"},
-
-    # ---------- Supreme ----------
     {"name": "Supreme Shader", "link": "https://mcpedl.com/supreme-shader/", "description": "🏆 الأسمى.", "emoji": "🏆"},
     {"name": "Supreme v2", "link": "https://mcpedl.com/supreme-shader-v2/", "description": "🥇 نسخة محسنة.", "emoji": "🥇"},
-
-    # ---------- Ultimate ----------
     {"name": "Ultimate Shader", "link": "https://mcpedl.com/ultimate-shader/", "description": "💯 النهائي.", "emoji": "💯"},
     {"name": "Ultimate v2", "link": "https://mcpedl.com/ultimate-shader-v2/", "description": "🎖️ إصدار ثاني.", "emoji": "🎖️"},
-
-    # ---------- Infinite ----------
     {"name": "Infinite Shader", "link": "https://mcpedl.com/infinite-shader/", "description": "♾️ لا نهائي.", "emoji": "♾️"},
     {"name": "Infinite v2", "link": "https://mcpedl.com/infinite-shader-v2/", "description": "🔁 نسخة جديدة.", "emoji": "🔁"},
-
-    # ---------- Eternal ----------
     {"name": "Eternal Shader", "link": "https://mcpedl.com/eternal-shader/", "description": "⏳ أبدي.", "emoji": "⏳"},
     {"name": "Eternal v2", "link": "https://mcpedl.com/eternal-shader-v2/", "description": "⌛ إصدار ثاني.", "emoji": "⌛"},
-
-    # ---------- Immortal ----------
     {"name": "Immortal Shader", "link": "https://mcpedl.com/immortal-shader/", "description": "🧬 خالد.", "emoji": "🧬"},
     {"name": "Immortal v2", "link": "https://mcpedl.com/immortal-shader-v2/", "description": "💪 نسخة محسنة.", "emoji": "💪"},
-
-    # ---------- Legendary ----------
     {"name": "Legendary Shader", "link": "https://mcpedl.com/legendary-shader/", "description": "🐉 أسطوري.", "emoji": "🐉"},
     {"name": "Legendary v2", "link": "https://mcpedl.com/legendary-shader-v2/", "description": "⚔️ إصدار جديد.", "emoji": "⚔️"},
-
-    # ---------- Mythic ----------
     {"name": "Mythic Shader", "link": "https://mcpedl.com/mythic-shader/", "description": "🔮 خرافي.", "emoji": "🔮"},
     {"name": "Mythic v2", "link": "https://mcpedl.com/mythic-shader-v2/", "description": "🧙 نسخة ثانية.", "emoji": "🧙"},
-
-    # ---------- Divine ----------
     {"name": "Divine Shader", "link": "https://mcpedl.com/divine-shader/", "description": "😇 إلهي.", "emoji": "😇"},
     {"name": "Divine v2", "link": "https://mcpedl.com/divine-shader-v2/", "description": "✝️ إصدار جديد.", "emoji": "✝️"},
-
-    # ---------- Godlike ----------
     {"name": "Godlike Shader", "link": "https://mcpedl.com/godlike-shader/", "description": "🌟 كالإله.", "emoji": "🌟"},
     {"name": "Godlike v2", "link": "https://mcpedl.com/godlike-shader-v2/", "description": "💫 نسخة محسنة.", "emoji": "💫"},
-
-    # ---------- Shadow ----------
     {"name": "Shadow Shader", "link": "https://mcpedl.com/shadow-shader/", "description": "👤 ظلال.", "emoji": "👤"},
     {"name": "Shadow v2", "link": "https://mcpedl.com/shadow-shader-v2/", "description": "🌑 إصدار ثاني.", "emoji": "🌑"},
-
-    # ---------- Light ----------
     {"name": "Light Shader", "link": "https://mcpedl.com/light-shader/", "description": "💡 ضوء.", "emoji": "💡"},
     {"name": "Light v2", "link": "https://mcpedl.com/light-shader-v2/", "description": "🔆 نسخة جديدة.", "emoji": "🔆"},
-
-    # ---------- Day ----------
     {"name": "Day Shader", "link": "https://mcpedl.com/day-shader/", "description": "🌞 نهار.", "emoji": "🌞"},
     {"name": "Day v2", "link": "https://mcpedl.com/day-shader-v2/", "description": "☀️ إصدار ثاني.", "emoji": "☀️"},
-
-    # ---------- Night ----------
     {"name": "Night Shader", "link": "https://mcpedl.com/night-shader/", "description": "🌙 ليل.", "emoji": "🌙"},
     {"name": "Night v2", "link": "https://mcpedl.com/night-shader-v2/", "description": "🌛 نسخة محسنة.", "emoji": "🌛"},
-
-    # ---------- Sun ----------
     {"name": "Sun Shader", "link": "https://mcpedl.com/sun-shader/", "description": "☀️ شمس.", "emoji": "☀️"},
     {"name": "Sun v2", "link": "https://mcpedl.com/sun-shader-v2/", "description": "🌅 إصدار جديد.", "emoji": "🌅"},
-
-    # ---------- Moon ----------
     {"name": "Moon Shader", "link": "https://mcpedl.com/moon-shader/", "description": "🌕 قمر.", "emoji": "🌕"},
     {"name": "Moon v2", "link": "https://mcpedl.com/moon-shader-v2/", "description": "🌖 نسخة ثانية.", "emoji": "🌖"},
-
-    # ---------- Star ----------
     {"name": "Star Shader", "link": "https://mcpedl.com/star-shader/", "description": "⭐ نجوم.", "emoji": "⭐"},
     {"name": "Star v2", "link": "https://mcpedl.com/star-shader-v2/", "description": "🌟 إصدار جديد.", "emoji": "🌟"},
-
-    # ---------- Cloud ----------
     {"name": "Cloud Shader", "link": "https://mcpedl.com/cloud-shader/", "description": "☁️ غيوم.", "emoji": "☁️"},
     {"name": "Cloud v2", "link": "https://mcpedl.com/cloud-shader-v2/", "description": "🌥️ نسخة محسنة.", "emoji": "🌥️"},
-
-    # ---------- Rain ----------
     {"name": "Rain Shader", "link": "https://mcpedl.com/rain-shader/", "description": "🌧️ مطر.", "emoji": "🌧️"},
     {"name": "Rain v2", "link": "https://mcpedl.com/rain-shader-v2/", "description": "☔ إصدار ثاني.", "emoji": "☔"},
-
-    # ---------- Storm ----------
     {"name": "Storm Shader", "link": "https://mcpedl.com/storm-shader/", "description": "⛈️ عاصفة.", "emoji": "⛈️"},
     {"name": "Storm v2", "link": "https://mcpedl.com/storm-shader-v2/", "description": "🌩️ نسخة جديدة.", "emoji": "🌩️"},
-
-    # ---------- Wind ----------
     {"name": "Wind Shader", "link": "https://mcpedl.com/wind-shader/", "description": "🌬️ رياح.", "emoji": "🌬️"},
     {"name": "Wind v2", "link": "https://mcpedl.com/wind-shader-v2/", "description": "💨 إصدار ثاني.", "emoji": "💨"},
-
-    # ---------- Fire ----------
     {"name": "Fire Shader", "link": "https://mcpedl.com/fire-shader/", "description": "🔥 نار.", "emoji": "🔥"},
     {"name": "Fire v2", "link": "https://mcpedl.com/fire-shader-v2/", "description": "🎇 نسخة محسنة.", "emoji": "🎇"},
-
-    # ---------- Ice ----------
     {"name": "Ice Shader", "link": "https://mcpedl.com/ice-shader/", "description": "❄️ جليد.", "emoji": "❄️"},
     {"name": "Ice v2", "link": "https://mcpedl.com/ice-shader-v2/", "description": "🧊 إصدار جديد.", "emoji": "🧊"},
-
-    # ---------- Earth ----------
     {"name": "Earth Shader", "link": "https://mcpedl.com/earth-shader/", "description": "🌍 أرض.", "emoji": "🌍"},
     {"name": "Earth v2", "link": "https://mcpedl.com/earth-shader-v2/", "description": "🌎 نسخة ثانية.", "emoji": "🌎"},
-
-    # ---------- Water ----------
     {"name": "Water Shader", "link": "https://mcpedl.com/water-shader/", "description": "💧 ماء.", "emoji": "💧"},
     {"name": "Water v2", "link": "https://mcpedl.com/water-shader-v2/", "description": "🌊 إصدار جديد.", "emoji": "🌊"},
-
-    # ---------- Nature ----------
     {"name": "Nature Shader", "link": "https://mcpedl.com/nature-shader/", "description": "🌳 طبيعة.", "emoji": "🌳"},
     {"name": "Nature v2", "link": "https://mcpedl.com/nature-shader-v2/", "description": "🌲 نسخة محسنة.", "emoji": "🌲"},
 ]
 
-# ====================== 5. إصدارات اللعبة ======================
-GAME_VERSIONS = [
-        # إصدارات 1.24 القديمة
-    {"num": "1️⃣", "name": "الإصدار 1.24.0", "icon": "🔴", "link": "https://mcpedl.org/pt/minecraft-pe-1.24.0-apk/"},
-    {"num": "2️⃣", "name": "الإصدار 1.24.10", "icon": "🔴", "link": "https://mcpedl.org/pt/minecraft-pe-1.24.10-apk/"},
-    {"num": "3️⃣", "name": "الإصدار 1.24.20", "icon": "🔴", "link": "https://mcpedl.org/pt/minecraft-pe-1.24.20-apk/"},
-    {"num": "4️⃣", "name": "الإصدار 1.24.30", "icon": "🔴", "link": "https://mcpedl.org/pt/minecraft-pe-1.24.30-apk/"},
+# تقسيم الشادرات حسب الاسم (الكلمة الأولى) مع تجميع المتشابهات
+SHADERS = {}
+for item in SHADERS_RAW:
+    name = item.get("name", "")
+    # استخراج الكلمة الأولى من الاسم
+    first_word = name.split()[0] if name else "أخرى"
     
-    # إصدارات 26.x الجديدة (فبراير - أغسطس 2026)
-    {"num": "5️⃣", "name": "الإصدار 26.0 (فبراير)", "icon": "🟤", "link": "https://mcpedl.org/pt/minecraft-pe-26-0-apk/"},
-    {"num": "6️⃣", "name": "الإصدار 26.1", "icon": "🟤", "link": "https://mcpedl.org/pt/minecraft-pe-26-1-apk/"},
-    {"num": "7️⃣", "name": "الإصدار 26.3.1", "icon": "🟤", "link": "https://mcpedl.org/pt/minecraft-pe-26-3-1-apk/"},
-    {"num": "8️⃣", "name": "الإصدار 26.20", "icon": "🟤", "link": "https://mcpedl.org/pt/minecraft-pe-26-20-apk/"},
-    {"num": "9️⃣", "name": "الإصدار 26.30", "icon": "🟤", "link": "https://mcpedl.org/pt/minecraft-pe-26-30-apk/"},
-    {"num": "🔟", "name": "الإصدار 26.32", "icon": "🟤", "link": "https://mcpedl.org/pt/minecraft-pe-26-32-apk/"},
-    {"num": "1️⃣1️⃣", "name": "الإصدار 26.33", "icon": "🟤", "link": "https://mcpedl.org/pt/minecraft-pe-26-33-apk/"},
-    {"num": "1️⃣2️⃣", "name": "الإصدار 26.40", "icon": "🟤", "link": "https://mcpedl.org/pt/minecraft-pe-26-40-apk/"},
-    {"num": "1️⃣3️⃣", "name": "الإصدار 26.44", "icon": "🟤", "link": "https://mcpedl.org/pt/minecraft-pe-26-44-apk/"},
-    {"num": "1️⃣4️⃣", "name": "الإصدار 26.45 (الأحدث)", "icon": "🟤", "link": "https://mcpedl.org/pt/minecraft-pe-26-45-apk/"},
-]
+    # توحيد بعض الأسماء الشائعة
+    if first_word in ["SEUS", "ESTN", "BSBE", "Haptic", "Zebra", "Newb", "Source", "Continuum", "Sildur's", "Chocapic13", "BSL", "KUDA", "Beyond", "Evident", "Natural", "Reality", "Enhanced", "Bare", "Mizuno's", "Stay", "ProjectLUMA", "AstraLex", "Voyager", "Creeper", "Ultra", "Kappa", "RRe36's", "SORA", "Vanilla", "Simple", "Pixel", "Retro", "CRUSH", "ESBE", "YSS", "Vibrant", "Dramatic", "Realistico", "Pinnacle", "Bliss", "Nostalgia", "Triliton's", "Soritong", "Pampas", "Llama", "Mellow", "Sakura", "Zenith", "Fusion", "Mystic", "Radiant", "Aurora", "Eclipse", "Nebula", "Cosmic", "Solar", "Lunar", "Stellar", "Galaxy", "Photon", "Quantum", "Ion", "Plasma", "Pulse", "Wave", "Flux", "Dynamo", "Volt", "Core", "Titan", "Colossus", "Atlas", "Hyper", "Extreme", "Pro", "Elite", "Prime", "Max", "Supreme", "Ultimate", "Infinite", "Eternal", "Immortal", "Legendary", "Mythic", "Divine", "Godlike", "Shadow", "Light", "Day", "Night", "Sun", "Moon", "Star", "Cloud", "Rain", "Storm", "Wind", "Fire", "Ice", "Earth", "Water", "Nature"]:
+        pass  # نتركها كما هي
+    else:
+        # تجميع الباقي في فئة "شادرات متنوعة"
+        first_word = "شادرات متنوعة"
+    
+    if first_word not in SHADERS:
+        SHADERS[first_word] = []
+    
+    # التأكد من وجود أيقونة
+    if "icon" not in item:
+        item["icon"] = item.get("emoji", "🌞")
+    SHADERS[first_word].append(item)
 
-# ====================== 6. عناصر بسيطة (جديدة) ======================
-SIMPLE_ITEMS = [
-    "العنصر الأول: مرحباً!",
-    "العنصر الثاني: هذا مثال",
-    "العنصر الثالث: للتنقل بين الصفحات",
-    "العنصر الرابع: باستخدام أزرار التالي والسابق",
-    "العنصر الخامس: يمكنك إضافة المزيد"
-]
-
-# ====================== تجميع الأقسام ======================
-ALL_CATEGORIES = {
-    "mods": {"title": "✦ مودات - MoDs ☠️ ✦", "items": MODS, "prefix": "mods", "per_page": 6},
-    "maps": {"title": "✦ مابات - MaPs 💎 ✦", "items": MAPS, "prefix": "maps", "per_page": 6},
-    "resus": {"title": "✦ ريـسـوس بـاكـات ⚡ ✦", "items": RESUS_PACKS, "prefix": "resus", "per_page": 6},
-    "shaders": {"title": "✦ شـادرات 🌞 ✦", "items": SHADERS, "prefix": "shaders", "per_page": 6},
-    "versions": {"title": "✦ إصدارات اللعبة 📥 ✦", "items": GAME_VERSIONS, "prefix": "versions", "per_page": 6},
+# ====================== 5. إصدارات اللعبة ======================
+GAME_VERSIONS = {
+    "إصدارات 1.24 القديمة": [
+        {"num": "1️⃣", "name": "الإصدار 1.24.0", "icon": "🔴", "link": "https://mcpedl.org/pt/minecraft-pe-1.24.0-apk/"},
+        {"num": "2️⃣", "name": "الإصدار 1.24.10", "icon": "🔴", "link": "https://mcpedl.org/pt/minecraft-pe-1.24.10-apk/"},
+        {"num": "3️⃣", "name": "الإصدار 1.24.20", "icon": "🔴", "link": "https://mcpedl.org/pt/minecraft-pe-1.24.20-apk/"},
+        {"num": "4️⃣", "name": "الإصدار 1.24.30", "icon": "🔴", "link": "https://mcpedl.org/pt/minecraft-pe-1.24.30-apk/"},
+    ],
+    "إصدارات 26.x الجديدة": [
+        {"num": "5️⃣", "name": "الإصدار 26.0 (فبراير)", "icon": "🟤", "link": "https://mcpedl.org/pt/minecraft-pe-26-0-apk/"},
+        {"num": "6️⃣", "name": "الإصدار 26.1", "icon": "🟤", "link": "https://mcpedl.org/pt/minecraft-pe-26-1-apk/"},
+        {"num": "7️⃣", "name": "الإصدار 26.3.1", "icon": "🟤", "link": "https://mcpedl.org/pt/minecraft-pe-26-3-1-apk/"},
+        {"num": "8️⃣", "name": "الإصدار 26.20", "icon": "🟤", "link": "https://mcpedl.org/pt/minecraft-pe-26-20-apk/"},
+        {"num": "9️⃣", "name": "الإصدار 26.30", "icon": "🟤", "link": "https://mcpedl.org/pt/minecraft-pe-26-30-apk/"},
+        {"num": "🔟", "name": "الإصدار 26.32", "icon": "🟤", "link": "https://mcpedl.org/pt/minecraft-pe-26-32-apk/"},
+        {"num": "1️⃣1️⃣", "name": "الإصدار 26.33", "icon": "🟤", "link": "https://mcpedl.org/pt/minecraft-pe-26-33-apk/"},
+        {"num": "1️⃣2️⃣", "name": "الإصدار 26.40", "icon": "🟤", "link": "https://mcpedl.org/pt/minecraft-pe-26-40-apk/"},
+        {"num": "1️⃣3️⃣", "name": "الإصدار 26.44", "icon": "🟤", "link": "https://mcpedl.org/pt/minecraft-pe-26-44-apk/"},
+        {"num": "1️⃣4️⃣", "name": "الإصدار 26.45 (الأحدث)", "icon": "🟤", "link": "https://mcpedl.org/pt/minecraft-pe-26-45-apk/"},
+    ],
 }
 
-# ====================== دوال عامة ======================
+# ====================== تجميع الأقسام الرئيسية ======================
+MAIN_CATEGORIES = {
+    "mods": {"title": "✦ مودات - MoDs ☠️ ✦", "subcategories": MODS, "prefix": "mods"},
+    "maps": {"title": "✦ مابات - MaPs 💎 ✦", "subcategories": MAPS, "prefix": "maps"},
+    "resus": {"title": "✦ ريـسـوس بـاكـات ⚡ ✦", "subcategories": RESUS_PACKS, "prefix": "resus"},
+    "shaders": {"title": "✦ شـادرات 🌞 ✦", "subcategories": SHADERS, "prefix": "shaders"},
+    "versions": {"title": "✦ إصدارات اللعبة 📥 ✦", "subcategories": GAME_VERSIONS, "prefix": "versions"},
+}
+
+ITEMS_PER_PAGE = 6
+
+# ====================== دوال العرض ======================
 def build_list_text(items, page, per_page):
     start = page * per_page
     end = min(start + per_page, len(items))
@@ -812,13 +615,10 @@ def build_list_text(items, page, per_page):
     text = header
     for i in range(start, end):
         item = items[i]
-        if isinstance(item, dict):
-            num = item.get('num', f"{i+1}.")
-            name = item.get('name', 'بدون اسم')
-            icon = item.get('icon', '🔹')
-            line = f"│  {num}  {name}  {icon}  │\n"
-        else:  # عنصر نصي بسيط
-            line = f"│  {i+1}.  {item}  │\n"
+        num = item.get('num', f"{i+1}.")
+        name = item.get('name', 'بدون اسم')
+        icon = item.get('icon', '🔹')
+        line = f"│  {num}  {name}  {icon}  │\n"
         text += line
     
     text += "└" + "─" * 38 + "┘\n"
@@ -826,22 +626,18 @@ def build_list_text(items, page, per_page):
     text += "\n𓆩  ⬅️  استخدم الأزرار للتنقل  ⬅️  𓆪"
     return text, start, end
 
-def build_keyboard(items, page, per_page, prefix):
+def build_keyboard(items, page, per_page, prefix, back_callback=None):
     keyboard = []
     start = page * per_page
     end = min(start + per_page, len(items))
     
     for i in range(start, end):
         item = items[i]
-        if isinstance(item, dict):
-            name = item.get('name', 'عنصر')
-            link = item.get('link', '#')
-        else:
-            name = item[:20] + '..' if len(item) > 20 else item
-            link = '#'  # لا يوجد رابط للعناصر النصية
+        name = item.get('name', 'عنصر')
+        link = item.get('link', '#')
         short_name = name[:12] + '..' if len(name) > 12 else name
-        btn_text = f"⬇️ تحميل {short_name}" if link != '#' else f"📄 {short_name}"
-        keyboard.append([InlineKeyboardButton(btn_text, url=link) if link != '#' else InlineKeyboardButton(btn_text, callback_data="noop")])
+        btn_text = f"⬇️ تحميل {short_name}"
+        keyboard.append([InlineKeyboardButton(btn_text, url=link)])
     
     nav_buttons = []
     if page > 0:
@@ -852,7 +648,12 @@ def build_keyboard(items, page, per_page, prefix):
     if nav_buttons:
         keyboard.append(nav_buttons)
     
-    keyboard.append([InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="main_menu")])
+    back_row = []
+    if back_callback:
+        back_row.append(InlineKeyboardButton("🔙 رجوع", callback_data=back_callback))
+    back_row.append(InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="main_menu"))
+    keyboard.append(back_row)
+    
     return InlineKeyboardMarkup(keyboard)
 
 # ====================== المعالجات ======================
@@ -873,65 +674,42 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     
     keyboard = []
-    for key, cat in ALL_CATEGORIES.items():
-        keyboard.append([InlineKeyboardButton(cat["title"], callback_data=f"show_{key}_0")])
-    
-    # إضافة زر لعرض العناصر البسيطة
-    keyboard.append([InlineKeyboardButton("📋 عناصر بسيطة", callback_data="show_simple_0")])
+    for key, cat in MAIN_CATEGORIES.items():
+        keyboard.append([InlineKeyboardButton(cat["title"], callback_data=f"main_{key}")])
     
     await update.message.reply_text(welcome, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
-async def show_category(update: Update, context: ContextTypes.DEFAULT_TYPE, category_key, page):
-    query = update.callback_query
-    await query.answer()
-    cat = ALL_CATEGORIES[category_key]
-    items = cat["items"]
-    prefix = cat["prefix"]
-    per_page = cat.get("per_page", 6)
-    
-    text, start, end = build_list_text(items, page, per_page)
-    keyboard = build_keyboard(items, page, per_page, prefix)
-    
-    title = cat["title"]
-    final_text = f"╔═══  <b>{title}</b>  ═══╗\n\n{text}"
-    
-    await query.edit_message_text(text=final_text, reply_markup=keyboard, parse_mode="HTML")
-
-async def show_simple_items(update: Update, context: ContextTypes.DEFAULT_TYPE, page: int):
-    """عرض العناصر البسيطة مع صفحة واحدة لكل عنصر"""
+async def show_subcategories(update: Update, context: ContextTypes.DEFAULT_TYPE, category_key: str):
     query = update.callback_query
     await query.answer()
     
-    per_page = 1  # عنصر واحد لكل صفحة
-    total_pages = (len(SIMPLE_ITEMS) + per_page - 1) // per_page
-    if page < 0 or page >= total_pages:
-        page = 0
+    cat = MAIN_CATEGORIES[category_key]
+    subcats = cat["subcategories"]
     
-    start = page * per_page
-    end = min(start + per_page, len(SIMPLE_ITEMS))
-    page_items = SIMPLE_ITEMS[start:end]
+    text = f"╔═══  <b>{cat['title']}</b>  ═══╗\n\n"
+    text += "✦  اختر الفئة المناسبة  ✦\n"
     
-    # بناء النص
-    text = f"📋 <b>قائمة العناصر البسيطة</b>\n"
-    text += f"╔══════════════════════════╗\n"
-    for i, item in enumerate(page_items, start=start+1):
-        text += f"║  {i}. {item}\n"
-    text += f"╚══════════════════════════╝\n"
-    text += f"\n📌 الصفحة {page+1} من {total_pages}"
-    
-    # بناء أزرار التنقل
     keyboard = []
-    row = []
-    if page > 0:
-        row.append(InlineKeyboardButton("◀️ السابق", callback_data=f"simple_{page-1}"))
-    if page < total_pages - 1:
-        row.append(InlineKeyboardButton("التالي ▶️", callback_data=f"simple_{page+1}"))
-    if row:
-        keyboard.append(row)
+    for sub_name in subcats.keys():
+        keyboard.append([InlineKeyboardButton(f"📂 {sub_name}", callback_data=f"sub_{category_key}_{sub_name}_0")])
+    
     keyboard.append([InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="main_menu")])
     
-    reply_markup = InlineKeyboardMarkup(keyboard)
-    await query.edit_message_text(text, reply_markup=reply_markup, parse_mode="HTML")
+    await query.edit_message_text(text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
+
+async def show_items(update: Update, context: ContextTypes.DEFAULT_TYPE, category_key: str, sub_name: str, page: int):
+    query = update.callback_query
+    await query.answer()
+    
+    items = MAIN_CATEGORIES[category_key]["subcategories"][sub_name]
+    per_page = ITEMS_PER_PAGE
+    
+    text, start, end = build_list_text(items, page, per_page)
+    back_callback = f"main_{category_key}"
+    keyboard = build_keyboard(items, page, per_page, f"items_{category_key}_{sub_name}", back_callback)
+    
+    final_text = f"📂  <b>{sub_name}</b>\n\n{text}"
+    await query.edit_message_text(text=final_text, reply_markup=keyboard, parse_mode="HTML")
 
 async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
@@ -948,9 +726,8 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     
     keyboard = []
-    for key, cat in ALL_CATEGORIES.items():
-        keyboard.append([InlineKeyboardButton(cat["title"], callback_data=f"show_{key}_0")])
-    keyboard.append([InlineKeyboardButton("📋 عناصر بسيطة", callback_data="show_simple_0")])
+    for key, cat in MAIN_CATEGORIES.items():
+        keyboard.append([InlineKeyboardButton(cat["title"], callback_data=f"main_{key}")])
     
     await query.edit_message_text(menu_text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
@@ -962,27 +739,26 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await main_menu(update, context)
         return
     
-    if data.startswith("show_simple"):
-        parts = data.split("_")
-        if len(parts) == 3:
-            page = int(parts[2])
-            await show_simple_items(update, context, page)
+    if data.startswith("main_"):
+        category_key = data.split("_")[1]
+        await show_subcategories(update, context, category_key)
         return
     
-    if data.startswith("simple"):
+    if data.startswith("sub_"):
         parts = data.split("_")
-        if len(parts) == 2:
-            page = int(parts[1])
-            await show_simple_items(update, context, page)
-        return
-    
-    # معالجة الأقسام العادية (مودات، مابات، إلخ)
-    parts = data.split("_")
-    if len(parts) == 3 and parts[0] == "show":
         category_key = parts[1]
-        page = int(parts[2])
-        if category_key in ALL_CATEGORIES:
-            await show_category(update, context, category_key, page)
+        sub_name = parts[2]
+        page = int(parts[3])
+        await show_items(update, context, category_key, sub_name, page)
+        return
+    
+    if data.startswith("items_"):
+        parts = data.split("_")
+        category_key = parts[1]
+        sub_name = parts[2]
+        page = int(parts[3])
+        await show_items(update, context, category_key, sub_name, page)
+        return
 
 # ====================== تشغيل البوت ======================
 def main():
@@ -990,14 +766,11 @@ def main():
     if not TOKEN:
         raise ValueError("لم يتم تعيين متغير TOKEN في البيئة !!")
     
-    # إنشاء التطبيق
     application = Application.builder().token(TOKEN).build()
-    
-    # معالجات الأوامر
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(handle_callback))
     
-    logging.info("✅ البوت يعمل الآن مع جميع الأقسام!")
+    logging.info("✅ البوت يعمل الآن مع نظام الفئات الفرعية (الشادرات مقسمة حسب الاسم)!")
     application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 if __name__ == "__main__":
