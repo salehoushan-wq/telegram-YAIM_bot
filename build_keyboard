@@ -1,0 +1,23 @@
+def build_keyboard(items, page, prefix):
+    keyboard = []
+    start = page * ITEMS_PER_PAGE
+    end = min(start + ITEMS_PER_PAGE, len(items))
+    
+    for i in range(start, end):
+        item = items[i]
+        name = item.get('name', 'عنصر')
+        link = item.get('link', '#')
+        btn_text = f"⬇️ تحميل {name[:10]}"
+        keyboard.append([InlineKeyboardButton(btn_text, url=link)])
+    
+    nav_buttons = []
+    if page > 0:
+        nav_buttons.append(InlineKeyboardButton("◀️ السابق", callback_data=f"{prefix}_{page-1}"))
+    if end < len(items):
+        nav_buttons.append(InlineKeyboardButton("التالي ▶️", callback_data=f"{prefix}_{page+1}"))
+    
+    if nav_buttons:
+        keyboard.append(nav_buttons)
+    
+    keyboard.append([InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="main_menu")])
+    return InlineKeyboardMarkup(keyboard)

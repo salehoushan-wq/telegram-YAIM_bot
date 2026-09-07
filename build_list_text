@@ -1,0 +1,23 @@
+def build_list_text(items, page):
+    start = page * ITEMS_PER_PAGE
+    end = min(start + ITEMS_PER_PAGE, len(items))
+    total = len(items)
+    
+    header = "╔" + "═" * 38 + "╗\n"
+    header += f"║  📦  إجمالي العناصر: {total}  📦  ║\n"
+    header += "╚" + "═" * 38 + "╝\n"
+    header += "┌" + "─" * 38 + "┐\n"
+    
+    text = header
+    for i in range(start, end):
+        item = items[i]
+        # محاولة استخراج الرقم من الحقول المتاحة
+        num = item.get('num', item.get('emoji', item.get('icon', '🔹')))
+        name = item.get('name', 'بدون اسم')
+        icon = item.get('icon', item.get('emoji', '🔹'))
+        line = f"│  {num}  {name}  {icon}  │\n"
+        text += line
+    
+    text += "└" + "─" * 38 + "┘\n"
+    text += "\n𓆩  ⬅️  استخدم الأزرار للتنقل  ⬅️  𓆪"
+    return text, start, end
