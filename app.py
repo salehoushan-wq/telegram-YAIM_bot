@@ -3,6 +3,7 @@ import unicodedata
 import re
 import os
 import json
+import html
 from PIL import Image, ImageDraw, ImageFont
 from datetime import time
 from zoneinfo import ZoneInfo
@@ -760,10 +761,26 @@ async def auto_post_two_mods(context: ContextTypes.DEFAULT_TYPE):
     # نشر المودين في القناة والمجموعة
     for item in selected:
         text, link = build_mod_post(item)
-        keyboard = (
-            [[InlineKeyboardButton("⬇️ تحميل المود", url=link)]]
-            if link else []
-        )
+        keyboard = []
+        if link:
+            # حفظ موقع العنصر بدل فتح رابط خارجي.
+            _found = None
+            for _ck, _cat in MAIN_CATEGORIES.items():
+                for _sn, _items in _cat.get("subcategories", {}).items():
+                    for _ii, _it in enumerate(_items):
+                        if _it is item:
+                            _found = (_ck, list(_cat["subcategories"].keys()).index(_sn), _ii)
+                            break
+                    if _found:
+                        break
+                if _found:
+                    break
+            if _found:
+                _ck, _si, _ii = _found
+                keyboard = [[InlineKeyboardButton(
+                    "⬇️ تحميل المود وإرساله لي",
+                    callback_data=f"download_mod:{_ck}:{_si}:{_ii}"
+                )]]
         markup = InlineKeyboardMarkup(keyboard) if keyboard else None
 
         for chat_id in (AUTO_POST_CHANNEL, AUTO_POST_GROUP):
@@ -876,7 +893,13 @@ async def show_mod_details(update: Update, context: ContextTypes.DEFAULT_TYPE,
     keyboard = []
     link = str(item.get("link", ""))
     if link.startswith(("http://", "https://")):
-        keyboard.append([InlineKeyboardButton("⬇️ تحميل المود", url=link)])
+        sub_index = list(MAIN_CATEGORIES[category_key]["subcategories"].keys()).index(sub_name)
+        keyboard.append([
+            InlineKeyboardButton(
+                "⬇️ تحميل المود وإرساله لي",
+                callback_data=f"download_mod:{category_key}:{sub_index}:{item_index}"
+            )
+        ])
     keyboard.append([
         InlineKeyboardButton("🔙 رجوع", callback_data=f"items_{category_key}_{sub_name}_{item_index // ITEMS_PER_PAGE}"),
         InlineKeyboardButton("🏠 الرئيسية", callback_data="main_menu")
@@ -1322,12 +1345,17 @@ def search_all_items(keyword):
                     continue
                 seen.add(unique_key)
 
+                sub_index = list(subcategories.keys()).index(sub_name)
+                item_index = items.index(item)
                 results.append({
                     "name": name or "بدون اسم",
                     "icon": icon,
                     "link": link,
                     "category": category_title,
                     "subcategory": sub_name,
+                    "category_key": category_key,
+                    "sub_index": sub_index,
+                    "item_index": item_index,
                 })
 
     # ترتيب النتائج: الاسم المطابق مباشرة يظهر أولًا.
@@ -1415,7 +1443,9 @@ async def send_search_results(update, keyword):
             keyboard.append([
                 InlineKeyboardButton(
                     f"⬇️ {short_name}",
-                    url=item["link"]
+                    callback_data=(
+                        f"download_mod:{item['category_key']}:{item['sub_index']}:{item['item_index']}"
+                    )
                 )
             ])
 
@@ -1455,6 +1485,92 @@ async def handle_search_message(update: Update, context: ContextTypes.DEFAULT_TY
     context.user_data.pop("search_mode", None)
     await send_search_results(update, keyword)
     return True
+
+
+
+# ====================== تنزيل المود وإرساله للمشترك ======================
+async def download_and_send_mod(update, context, item):
+    message = update.effective_message
+    if not message:
+        return
+
+    link = str(item.get("link", "")).strip()
+    name = str(item.get("name", "مود")).strip() or "مود"
+
+    if not link.startswith(("http://", "https://")):
+        await message.reply_text("❌ رابط تحميل هذا المود غير صالح.")
+        return
+
+    status = await message.reply_text(
+        f"⏬ جاري تنزيل <b>{html.escape(name)}</b>...\n"
+        "يرجى الانتظار.",
+        parse_mode="HTML"
+    )
+
+    temp_dir = Path("/tmp/bot_downloads")
+    temp_dir.mkdir(parents=True, exist_ok=True)
+
+    safe_name = re.sub(r"[^A-Za-z0-9._-]+", "_", name)[:80] or "mod"
+    ext = Path(link.split("?", 1)[0]).suffix[:10]
+    filename = safe_name + (ext if ext else ".bin")
+    filepath = temp_dir / filename
+
+    try:
+        timeout = aiohttp.ClientTimeout(total=300)
+        async with aiohttp.ClientSession(timeout=timeout) as session:
+            async with session.get(link, allow_redirects=True) as response:
+                if response.status != 200:
+                    await status.edit_text(
+                        f"❌ تعذر تنزيل المود.\nرمز الاستجابة: {response.status}"
+                    )
+                    return
+
+                total = 0
+                max_size = 50 * 1024 * 1024  # 50 MB
+                with open(filepath, "wb") as f:
+                    async for chunk in response.content.iter_chunked(1024 * 256):
+                        total += len(chunk)
+                        if total > max_size:
+                            await status.edit_text(
+                                "❌ حجم الملف أكبر من الحد المسموح به (50 MB)."
+                            )
+                            return
+                        f.write(chunk)
+
+        await status.edit_text(
+            f"📤 تم تنزيل <b>{html.escape(name)}</b>، جاري إرساله لك...",
+            parse_mode="HTML"
+        )
+
+        caption = (
+            f"📦 <b>{html.escape(name)}</b>\n"
+            f"📝 {html.escape(str(get_mod_description(item)))}"
+        )
+
+        with open(filepath, "rb") as document:
+            await message.reply_document(
+                document=document,
+                filename=filename,
+                caption=caption,
+                parse_mode="HTML"
+            )
+
+        await status.delete()
+
+    except asyncio.TimeoutError:
+        await status.edit_text("❌ انتهى وقت تنزيل الملف. حاول مرة أخرى.")
+    except Exception as exc:
+        logging.exception("فشل تنزيل المود: %s", exc)
+        await status.edit_text(
+            "❌ حدث خطأ أثناء تنزيل المود أو إرساله.\n"
+            "تأكد أن رابط التحميل مباشر ويعمل."
+        )
+    finally:
+        try:
+            if filepath.exists():
+                filepath.unlink()
+        except Exception:
+            pass
 
 
 # ====================== المعالجات ======================
@@ -1622,6 +1738,30 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "يمكنك إرسال نص أو صورة أو ملف.\n\n"
             "❌ للإلغاء أرسل /cancel_broadcast"
         )
+        return
+
+    if query.data.startswith("download_mod:"):
+        if await subscriber_gate(update, context):
+            return
+
+        await query.answer("⏬ جاري تنزيل المود...")
+        parts = query.data.split(":")
+        if len(parts) != 4:
+            await query.message.reply_text("❌ بيانات التحميل غير صحيحة.")
+            return
+
+        try:
+            category_key = parts[1]
+            sub_index = int(parts[2])
+            item_index = int(parts[3])
+            sub_names = list(MAIN_CATEGORIES[category_key]["subcategories"].keys())
+            sub_name = sub_names[sub_index]
+            item = MAIN_CATEGORIES[category_key]["subcategories"][sub_name][item_index]
+        except (KeyError, IndexError, ValueError, TypeError):
+            await query.message.reply_text("❌ لم يتم العثور على المود.")
+            return
+
+        await download_and_send_mod(update, context, item)
         return
 
     if query.data == "search_again":
