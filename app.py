@@ -1,6 +1,9 @@
 import logging
+import unicodedata
+import re
 import os
 import json
+from PIL import Image, ImageDraw, ImageFont
 from datetime import time
 from zoneinfo import ZoneInfo
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
@@ -669,8 +672,8 @@ load_data()
 # ====================== النشر التلقائي اليومي ======================
 # ضع معرف القناة والمجموعة هنا.
 # يمكن أن يكون المعرف رقمًا مثل -1001234567890 أو اسم مستخدم مثل @my_channel
-AUTO_POST_CHANNEL = os.environ.get("AUTO_POST_CHANNEL", "@YAMI_X39")
-AUTO_POST_GROUP = os.environ.get("AUTO_POST_GROUP", "@llYzA8")
+AUTO_POST_CHANNEL = os.environ.get("AUTO_POST_CHANNEL", "@YOUR_CHANNEL")
+AUTO_POST_GROUP = os.environ.get("AUTO_POST_GROUP", "@YOUR_GROUP")
 
 AUTO_POST_FILE = "auto_post_state.json"
 
@@ -785,6 +788,116 @@ async def post_now(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("✅ تم تنفيذ نشر مودين الآن في القناة والمجموعة.")
 
 # ====================== دوال العرض ======================
+
+# ====================== صور ووصف المودات ======================
+MOD_IMAGES_DIR = "mod_images"
+os.makedirs(MOD_IMAGES_DIR, exist_ok=True)
+
+def get_mod_description(item):
+    """الوصف المخصص للمود، أو وصف تلقائي إذا لم تتم إضافته."""
+    description = item.get("description")
+    if description:
+        return str(description)
+
+    name = item.get("name", "هذا المود")
+    return (
+        f"🛠️ <b>{name}</b>\n\n"
+        "✨ مود لماينكرافت يضيف محتوى جديدًا إلى اللعبة.\n"
+        "📌 اضغط على زر التحميل للحصول على الرابط."
+    )
+
+
+def _safe_filename(value):
+    value = re.sub(r"[^\w\u0600-\u06FF-]+", "_", str(value))
+    return value[:80] or "mod"
+
+
+def get_mod_card_image(item):
+    """
+    إذا أضفت image/photo داخل بيانات المود سيُستخدم الرابط كصورة.
+    وإلا يتم إنشاء صورة تعريفية تلقائيًا للمود وحفظها محليًا.
+    """
+    image_url = item.get("image") or item.get("photo")
+    if isinstance(image_url, str) and image_url.startswith(("http://", "https://")):
+        return image_url
+
+    name = str(item.get("name", "Minecraft Mod"))
+    icon = str(item.get("icon", "🛠️"))
+    filename = os.path.join(MOD_IMAGES_DIR, _safe_filename(name) + ".png")
+
+    if not os.path.exists(filename):
+        # بطاقة تعريفية بسيطة وفريدة لكل مود.
+        img = Image.new("RGB", (900, 500), (25, 35, 50))
+        draw = ImageDraw.Draw(img)
+
+        try:
+            font_big = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 58)
+            font_small = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 34)
+        except Exception:
+            font_big = ImageFont.load_default()
+            font_small = ImageFont.load_default()
+
+        draw.rounded_rectangle((20, 20, 880, 480), radius=35, outline=(80, 170, 255), width=5)
+        draw.text((450, 105), icon, font=font_big, anchor="mm")
+        draw.text((450, 230), "MINECRAFT MOD", font=font_small, anchor="mm")
+        # الاسم قد يظهر RTL بشكل مبسط، بينما الاسم الإنجليزي يظهر طبيعيًا.
+        draw.text((450, 330), name[:28], font=font_big, anchor="mm")
+        draw.text((450, 425), "MOD DETAILS", font=font_small, anchor="mm")
+        img.save(filename)
+
+    return filename
+
+
+async def show_mod_details(update: Update, context: ContextTypes.DEFAULT_TYPE,
+                           category_key: str, sub_index: int, item_index: int):
+    query = update.callback_query
+    if await subscriber_gate(update, context):
+        return
+
+    try:
+        sub_names = list(MAIN_CATEGORIES[category_key]["subcategories"].keys())
+        sub_name = sub_names[sub_index]
+        items = MAIN_CATEGORIES[category_key]["subcategories"][sub_name]
+        item = items[item_index]
+    except (KeyError, IndexError, TypeError):
+        await query.answer("❌ المود غير موجود.", show_alert=True)
+        return
+
+    await query.answer()
+
+    description = get_mod_description(item)
+    caption = (
+        f"📦 <b>{item.get('name', 'مود')}</b>\n\n"
+        f"{description}\n\n"
+        f"📂 القسم: <b>{sub_name}</b>"
+    )
+
+    image = get_mod_card_image(item)
+    keyboard = []
+    link = str(item.get("link", ""))
+    if link.startswith(("http://", "https://")):
+        keyboard.append([InlineKeyboardButton("⬇️ تحميل المود", url=link)])
+    keyboard.append([
+        InlineKeyboardButton("🔙 رجوع", callback_data=f"items_{category_key}_{sub_name}_{item_index // ITEMS_PER_PAGE}"),
+        InlineKeyboardButton("🏠 الرئيسية", callback_data="main_menu")
+    ])
+
+    try:
+        await query.message.reply_photo(
+            photo=image,
+            caption=caption[:1024],
+            reply_markup=InlineKeyboardMarkup(keyboard),
+            parse_mode="HTML"
+        )
+    except Exception:
+        # إذا كانت الصورة غير قابلة للإرسال، نعرض الوصف بدون صورة.
+        await query.message.reply_text(
+            caption,
+            reply_markup=InlineKeyboardMarkup(keyboard),
+            parse_mode="HTML"
+        )
+
+
 def build_list_text(items, page, per_page):
     start = page * per_page
     end = min(start + per_page, len(items))
@@ -813,31 +926,65 @@ def build_keyboard(items, page, per_page, prefix, back_callback=None):
     keyboard = []
     start = page * per_page
     end = min(start + per_page, len(items))
-    
+
+    # استخراج القسم من prefix عندما يكون من نوع items_mods_...
+    category_key = None
+    if prefix.startswith("items_"):
+        parts = prefix.split("_", 2)
+        if len(parts) >= 2:
+            category_key = parts[1]
+
+    sub_index = None
+    if category_key in MAIN_CATEGORIES:
+        # prefix يحتوي اسم الفئة الفرعية وقد يكون عربيًا.
+        sub_part = prefix.split("_", 2)[2] if len(prefix.split("_", 2)) > 2 else ""
+        sub_names = list(MAIN_CATEGORIES[category_key]["subcategories"].keys())
+        for idx, name in enumerate(sub_names):
+            if name == sub_part:
+                sub_index = idx
+                break
+
     for i in range(start, end):
         item = items[i]
         name = item.get('name', 'عنصر')
         link = item.get('link', '#')
         short_name = name[:12] + '..' if len(name) > 12 else name
-        btn_text = f"⬇️ تحميل {short_name}"
-        keyboard.append([InlineKeyboardButton(btn_text, url=link)])
-    
+
+        # المودات: تفاصيل + تحميل.
+        if category_key == "mods" and sub_index is not None:
+            keyboard.append([
+                InlineKeyboardButton(
+                    f"📋 تفاصيل {short_name}",
+                    callback_data=f"modview_{category_key}_{sub_index}_{i}"
+                )
+            ])
+            if isinstance(link, str) and link.startswith(("http://", "https://")):
+                keyboard.append([
+                    InlineKeyboardButton(f"⬇️ تحميل {short_name}", url=link)
+                ])
+        else:
+            if isinstance(link, str) and link.startswith(("http://", "https://")):
+                keyboard.append([
+                    InlineKeyboardButton(f"⬇️ تحميل {short_name}", url=link)
+                ])
+
     nav_buttons = []
     if page > 0:
         nav_buttons.append(InlineKeyboardButton("◀️ السابق", callback_data=f"{prefix}_{page-1}"))
     if end < len(items):
         nav_buttons.append(InlineKeyboardButton("التالي ▶️", callback_data=f"{prefix}_{page+1}"))
-    
+
     if nav_buttons:
         keyboard.append(nav_buttons)
-    
+
     back_row = []
     if back_callback:
         back_row.append(InlineKeyboardButton("🔙 رجوع", callback_data=back_callback))
     back_row.append(InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="main_menu"))
     keyboard.append(back_row)
-    
+
     return InlineKeyboardMarkup(keyboard)
+
 
 async def stop_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
     global AUTO_POST_ENABLED
@@ -1097,39 +1244,100 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
 
 
 # ====================== البحث لجميع المستخدمين ======================
-def normalize_search(text):
-    text = (text or "").strip().casefold()
-    # توحيد بعض أشكال الحروف العربية لتسهيل البحث
-    for a, b in {
-        "أ": "ا", "إ": "ا", "آ": "ا",
-        "ى": "ي", "ة": "ه",
-    }.items():
-        text = text.replace(a, b)
-    return text
+def normalize_search(value):
+    """تطبيع النص العربي والإنجليزي حتى يعمل البحث مع اختلاف الكتابة."""
+    value = str(value or "").strip().casefold()
+
+    # إزالة التشكيل والتطويل.
+    value = "".join(
+        ch for ch in unicodedata.normalize("NFD", value)
+        if unicodedata.category(ch) != "Mn"
+    ).replace("ـ", "")
+
+    # توحيد الحروف العربية المتشابهة.
+    replacements = {
+        "أ": "ا", "إ": "ا", "آ": "ا", "ٱ": "ا",
+        "ى": "ي", "ئ": "ي", "ؤ": "و",
+        "ة": "ه",
+    }
+    for old, new in replacements.items():
+        value = value.replace(old, new)
+
+    # توحيد المسافات والرموز الشائعة.
+    value = re.sub(r"[\u200f\u200e]", "", value)
+    value = re.sub(r"\s+", " ", value)
+    return value
 
 
 def search_all_items(keyword):
-    q = normalize_search(keyword)
-    if not q:
+    """البحث في كل الأقسام والفئات، مع دعم أكثر من كلمة."""
+    query = normalize_search(keyword)
+    if not query:
         return []
 
+    # البحث بالكلمات: يجب أن تظهر كل كلمات البحث في بيانات العنصر.
+    words = [w for w in query.split() if w]
+
     results = []
+    seen = set()
+
     for category_key, category in MAIN_CATEGORIES.items():
         category_title = category.get("title", category_key)
-        for sub_name, items in category.get("subcategories", {}).items():
+        subcategories = category.get("subcategories", {})
+
+        for sub_name, items in subcategories.items():
+            if not isinstance(items, list):
+                continue
+
             for item in items:
-                name = item.get("name", "")
-                haystack = normalize_search(
-                    f"{name} {sub_name} {category_title}"
+                if not isinstance(item, dict):
+                    continue
+
+                name = str(item.get("name", ""))
+                link = str(item.get("link", ""))
+                icon = str(item.get("icon", "🔹"))
+
+                searchable = normalize_search(
+                    f"{name} {sub_name} {category_title} {link}"
                 )
-                if q in haystack:
-                    results.append({
-                        "name": name,
-                        "icon": item.get("icon", "🔹"),
-                        "link": item.get("link", "#"),
-                        "category": category_title,
-                        "subcategory": sub_name,
-                    })
+
+                # يدعم:
+                # 1) تطابق العبارة كاملة
+                # 2) تطابق جميع الكلمات حتى لو كانت متباعدة
+                matched = query in searchable or all(
+                    word in searchable for word in words
+                )
+
+                if not matched:
+                    continue
+
+                # منع التكرار.
+                unique_key = (
+                    category_key,
+                    sub_name,
+                    name,
+                    link,
+                )
+                if unique_key in seen:
+                    continue
+                seen.add(unique_key)
+
+                results.append({
+                    "name": name or "بدون اسم",
+                    "icon": icon,
+                    "link": link,
+                    "category": category_title,
+                    "subcategory": sub_name,
+                })
+
+    # ترتيب النتائج: الاسم المطابق مباشرة يظهر أولًا.
+    results.sort(
+        key=lambda x: (
+            0 if query == normalize_search(x["name"]) else
+            1 if query in normalize_search(x["name"]) else 2,
+            normalize_search(x["name"])
+        )
+    )
     return results
 
 
@@ -1138,13 +1346,17 @@ async def search_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return
 
     keyword = " ".join(context.args).strip()
+
     if not keyword:
         context.user_data["search_mode"] = True
         await update.message.reply_text(
-            "🔎 <b>البحث</b>\n\n"
-            "أرسل الآن اسم المود أو الماب أو الشادر أو الريسوس باك الذي تريد البحث عنه.\n\n"
-            "مثال: <code>PES</code> أو <code>Shaders</code>\n"
-            "❌ للإلغاء أرسل /cancel_search",
+            "🔎 <b>البحث في جميع الأقسام</b>\n\n"
+            "أرسل اسم المود أو الماب أو الشادر أو الريسوس باك.\n\n"
+            "مثال:\n"
+            "<code>/search السيف</code>\n"
+            "<code>/search zombie</code>\n"
+            "<code>/search 26.45</code>\n\n"
+            "❌ للإلغاء: /cancel_search",
             parse_mode="HTML"
         )
         return
@@ -1157,44 +1369,65 @@ async def cancel_search(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text("❌ تم إلغاء البحث.")
 
 
-async def send_search_results(update: Update, keyword):
+async def send_search_results(update, keyword):
     results = search_all_items(keyword)
 
     if not results:
         await update.effective_message.reply_text(
-            f"🔎 لا توجد نتائج لـ: <b>{keyword}</b>\n\n"
-            "جرّب كلمة أخرى.",
+            f"🔎 <b>لا توجد نتائج</b>\n\n"
+            f"بحثت عن: <code>{keyword}</code>\n\n"
+            "جرّب كلمة أقصر، مثل:\n"
+            "• السيف\n"
+            "• zombie\n"
+            "• map\n"
+            "• shader",
             parse_mode="HTML"
         )
         return
 
+    # حفظ نتائج البحث حتى يستطيع المستخدم الانتقال بين الصفحات.
+    update.effective_user and None
+    if update.effective_message:
+        # context.user_data غير متاح هنا، لذلك يعتمد العرض على أول 20 نتيجة.
+        pass
+
     shown = results[:20]
     lines = [
-        f"🔎 <b>نتائج البحث عن:</b> {keyword}\n",
-        f"📊 تم العثور على <b>{len(results)}</b> نتيجة."
+        "╔══════════════════════════╗",
+        "║      🔎 نتائج البحث      ║",
+        "╚══════════════════════════╝",
+        "",
+        f"🔍 البحث: <b>{keyword}</b>",
+        f"📊 النتائج: <b>{len(results)}</b>",
+        ""
     ]
 
     keyboard = []
-    for item in shown:
+
+    for index, item in enumerate(shown, 1):
         lines.append(
-            f"\n{item['icon']} <b>{item['name']}</b>\n"
-            f"📂 {item['category']} ← {item['subcategory']}"
+            f"{index}. {item['icon']} <b>{item['name']}</b>\n"
+            f"   📂 {item['subcategory']}"
         )
+
         if item["link"].startswith(("http://", "https://")):
-            short_name = item["name"][:18] + ".." if len(item["name"]) > 18 else item["name"]
+            short_name = item["name"][:20] + "…" if len(item["name"]) > 20 else item["name"]
             keyboard.append([
                 InlineKeyboardButton(
-                    f"⬇️ تحميل {short_name}",
+                    f"⬇️ {short_name}",
                     url=item["link"]
                 )
             ])
 
     if len(results) > 20:
-        lines.append("\n⚠️ يتم عرض أول 20 نتيجة فقط.")
+        lines.append(
+            f"\n⚠️ توجد {len(results) - 20} نتائج إضافية. "
+            "استخدم كلمة بحث أكثر تحديدًا."
+        )
 
     keyboard.append([
         InlineKeyboardButton("🔎 بحث جديد", callback_data="search_again"),
-        InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="main_menu")
+        InlineKeyboardButton("🏠 الرئيسية", callback_data="main_menu")
     ])
 
     await update.effective_message.reply_text(
@@ -1212,9 +1445,11 @@ async def handle_search_message(update: Update, context: ContextTypes.DEFAULT_TY
         context.user_data.pop("search_mode", None)
         return True
 
-    keyword = (update.effective_message.text or "").strip()
+    message = update.effective_message
+    keyword = (message.text or "").strip() if message else ""
+
     if not keyword:
-        await update.effective_message.reply_text("❌ أرسل كلمة للبحث.")
+        await message.reply_text("❌ أرسل كلمة للبحث.")
         return True
 
     context.user_data.pop("search_mode", None)
@@ -1242,12 +1477,43 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "╚══════════════════════════╝"
     )
     
-    keyboard = []
-    keyboard.append([InlineKeyboardButton("🔎 البحث في جميع الأقسام", callback_data="search_again")])
-    for key, cat in MAIN_CATEGORIES.items():
-        keyboard.append([InlineKeyboardButton(cat["title"], callback_data=f"main_{key}")])
-    
-    await update.message.reply_text(welcome, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
+    # ===== القائمة الرئيسية بتنسيق قريب من الصورة المرفقة =====
+    keyboard = [
+        [InlineKeyboardButton("🔎 البحث في جميع الأقسام", callback_data="search_again")]
+    ]
+
+    if "mods" in MAIN_CATEGORIES:
+        keyboard.append([
+            InlineKeyboardButton("🛠️ مودات | Mods", callback_data="main_mods")
+        ])
+
+    for left_key, right_key in [("maps", "resus"), ("shaders", "versions")]:
+        row = []
+        for key in (left_key, right_key):
+            if key in MAIN_CATEGORIES:
+                row.append(
+                    InlineKeyboardButton(
+                        MAIN_CATEGORIES[key]["title"],
+                        callback_data=f"main_{key}"
+                    )
+                )
+        if row:
+            keyboard.append(row)
+
+    # أي قسم جديد يضاف لاحقًا سيظهر تلقائيًا.
+    used = {"mods", "maps", "resus", "shaders", "versions"}
+    extra = [(key, cat) for key, cat in MAIN_CATEGORIES.items() if key not in used]
+    for i in range(0, len(extra), 2):
+        keyboard.append([
+            InlineKeyboardButton(cat["title"], callback_data=f"main_{key}")
+            for key, cat in extra[i:i + 2]
+        ])
+
+    await update.message.reply_text(
+        welcome,
+        reply_markup=InlineKeyboardMarkup(keyboard),
+        parse_mode="HTML"
+    )
 
 async def show_subcategories(update: Update, context: ContextTypes.DEFAULT_TYPE, category_key: str):
     query = update.callback_query
@@ -1370,6 +1636,17 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "❌ للإلغاء أرسل /cancel_search",
             parse_mode="HTML"
         )
+        return
+
+    if query.data.startswith("modview_"):
+        parts = query.data.split("_")
+        if len(parts) != 4:
+            await query.answer("❌ بيانات المود غير صحيحة.", show_alert=True)
+            return
+        category_key = parts[1]
+        sub_index = int(parts[2])
+        item_index = int(parts[3])
+        await show_mod_details(update, context, category_key, sub_index, item_index)
         return
 
     data = query.data
@@ -1537,6 +1814,19 @@ async def subscriber_gate(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await message.reply_text("⏸️ البوت متوقف مؤقتًا عند المشتركين. حاول لاحقًا.")
     return True
 
+# إنشاء وصف تلقائي لكل مود لا يملك وصفًا.
+def enrich_mods_with_descriptions():
+    for sub_name, items in MODS.items():
+        for item in items:
+            if not item.get("description"):
+                item["description"] = (
+                    f"🛠️ {item.get('name', 'مود')}\n"
+                    "✨ مود لماينكرافت يضيف محتوى وتجربة جديدة.\n"
+                    f"📂 التصنيف: {sub_name}"
+                )
+
+enrich_mods_with_descriptions()
+
 # ====================== تشغيل البوت ======================
 def main():
     TOKEN = os.environ.get("TOKEN")
@@ -1564,6 +1854,7 @@ def main():
         name="daily_two_mods"
     )
     from telegram.ext import MessageHandler, filters
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_search_message))
     application.add_handler(MessageHandler(filters.ALL & ~filters.COMMAND, handle_broadcast))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_admin_message))
     
