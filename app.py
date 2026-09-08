@@ -1,6 +1,8 @@
 import logging
 import os
 import json
+from datetime import time
+from zoneinfo import ZoneInfo
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
@@ -603,13 +605,37 @@ MAIN_CATEGORIES = {
 ITEMS_PER_PAGE = 6
 
 # ====================== صلاحيات المطور والمشرفين ======================
-DEVELOPER_ID =  7370937034  # ضع هنا أي دي المطور
+DEVELOPER_ID = 7370937034  # ضع هنا أي دي المطور
 MODS_IDS = {
     111111111,  # المشرف الأول
     222222222,  # المشرف الثاني
 }
 
 DATA_FILE = "bot_data.json"
+USERS_FILE = "bot_users.json"
+
+def load_users():
+    if not os.path.exists(USERS_FILE):
+        return set()
+    try:
+        with open(USERS_FILE, "r", encoding="utf-8") as f:
+            return {int(x) for x in json.load(f)}
+    except Exception:
+        logging.exception("فشل تحميل قائمة المستخدمين")
+        return set()
+
+USERS = load_users()
+
+def register_user(update: Update):
+    user = update.effective_user
+    if not user or user.id in USERS:
+        return
+    USERS.add(user.id)
+    try:
+        with open(USERS_FILE, "w", encoding="utf-8") as f:
+            json.dump(sorted(USERS), f, ensure_ascii=False, indent=2)
+    except Exception:
+        logging.exception("فشل حفظ قائمة المستخدمين")
 
 def is_staff(update: Update) -> bool:
     user = update.effective_user
@@ -639,6 +665,124 @@ def load_data():
         logging.exception("فشل تحميل البيانات")
 
 load_data()
+
+# ====================== النشر التلقائي اليومي ======================
+# ضع معرف القناة والمجموعة هنا.
+# يمكن أن يكون المعرف رقمًا مثل -1001234567890 أو اسم مستخدم مثل @my_channel
+AUTO_POST_CHANNEL = os.environ.get("AUTO_POST_CHANNEL", "@YOUR_CHANNEL")
+AUTO_POST_GROUP = os.environ.get("AUTO_POST_GROUP", "@YOUR_GROUP")
+
+AUTO_POST_FILE = "auto_post_state.json"
+
+# ===== إرسال رسالة للمشتركين =====
+BROADCAST_MODE = {}
+AUTO_POST_HOUR = 20       # الساعة 8 مساءً بتوقيت اليمن
+AUTO_POST_MINUTE = 0
+AUTO_POST_STATUS_FILE = "auto_post_status.json"
+
+def load_auto_post_enabled():
+    try:
+        if os.path.exists(AUTO_POST_STATUS_FILE):
+            with open(AUTO_POST_STATUS_FILE, "r", encoding="utf-8") as f:
+                return bool(json.load(f).get("enabled", True))
+    except Exception:
+        logging.exception("فشل تحميل حالة البوت")
+    return True
+
+def save_auto_post_enabled(enabled):
+    try:
+        with open(AUTO_POST_STATUS_FILE, "w", encoding="utf-8") as f:
+            json.dump({"enabled": bool(enabled)}, f, ensure_ascii=False, indent=2)
+    except Exception:
+        logging.exception("فشل حفظ حالة البوت")
+
+AUTO_POST_ENABLED = load_auto_post_enabled()
+
+def load_auto_post_index():
+    try:
+        if os.path.exists(AUTO_POST_FILE):
+            with open(AUTO_POST_FILE, "r", encoding="utf-8") as f:
+                data = json.load(f)
+                return int(data.get("next_index", 0))
+    except Exception:
+        logging.exception("فشل تحميل حالة النشر التلقائي")
+    return 0
+
+def save_auto_post_index(index):
+    try:
+        with open(AUTO_POST_FILE, "w", encoding="utf-8") as f:
+            json.dump({"next_index": index}, f, ensure_ascii=False, indent=2)
+    except Exception:
+        logging.exception("فشل حفظ حالة النشر التلقائي")
+
+AUTO_POST_INDEX = load_auto_post_index()
+
+def get_auto_post_mods():
+    # النشر من قسم "جميع المودات" بالتسلسل
+    return MODS.get("جميع المودات", [])
+
+def build_mod_post(item):
+    name = item.get("name", "مود جديد")
+    icon = item.get("icon", "🔥")
+    link = item.get("link", "")
+    return (
+        f"{icon} <b>{name}</b>\n\n"
+        "✨ مود جديد من بوت مودات ماين كرافت!\n"
+        "📥 اضغط الزر بالأسفل للتحميل."
+    ), link
+
+async def auto_post_two_mods(context: ContextTypes.DEFAULT_TYPE):
+    global AUTO_POST_INDEX
+
+    if not AUTO_POST_ENABLED:
+        logging.info("⏸️ النشر التلقائي متوقف.")
+        return
+
+    if AUTO_POST_CHANNEL == "@YOUR_CHANNEL" or AUTO_POST_GROUP == "@YOUR_GROUP":
+        logging.warning("⚠️ لم يتم ضبط AUTO_POST_CHANNEL و AUTO_POST_GROUP.")
+        return
+
+    mods = get_auto_post_mods()
+    if not mods:
+        logging.warning("⚠️ لا توجد مودات للنشر التلقائي.")
+        return
+
+    # إذا وصلنا للنهاية نبدأ من أول القائمة مرة أخرى
+    selected = []
+    for _ in range(min(2, len(mods))):
+        item = mods[AUTO_POST_INDEX % len(mods)]
+        selected.append(item)
+        AUTO_POST_INDEX = (AUTO_POST_INDEX + 1) % len(mods)
+
+    # نشر المودين في القناة والمجموعة
+    for item in selected:
+        text, link = build_mod_post(item)
+        keyboard = (
+            [[InlineKeyboardButton("⬇️ تحميل المود", url=link)]]
+            if link else []
+        )
+        markup = InlineKeyboardMarkup(keyboard) if keyboard else None
+
+        for chat_id in (AUTO_POST_CHANNEL, AUTO_POST_GROUP):
+            try:
+                await context.bot.send_message(
+                    chat_id=chat_id,
+                    text=text,
+                    reply_markup=markup,
+                    parse_mode="HTML"
+                )
+            except Exception:
+                logging.exception("❌ فشل نشر مود في %s", chat_id)
+
+    save_auto_post_index(AUTO_POST_INDEX)
+    logging.info("✅ تم نشر %d مود تلقائيًا.", len(selected))
+
+async def post_now(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not is_developer(update):
+        await update.message.reply_text("❌ هذا الأمر خاص بالمطور فقط.")
+        return
+    await auto_post_two_mods(context)
+    await update.message.reply_text("✅ تم تنفيذ نشر مودين الآن في القناة والمجموعة.")
 
 # ====================== دوال العرض ======================
 def build_list_text(items, page, per_page):
@@ -695,16 +839,98 @@ def build_keyboard(items, page, per_page, prefix, back_callback=None):
     
     return InlineKeyboardMarkup(keyboard)
 
+async def stop_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    global AUTO_POST_ENABLED
+    if not is_developer(update):
+        await update.message.reply_text("❌ هذا الأمر خاص بالمطور فقط.")
+        return
+    AUTO_POST_ENABLED = False
+    save_auto_post_enabled(False)
+    await update.message.reply_text("⏸️ تم إيقاف النشر التلقائي. البوت نفسه ما زال يعمل ويمكنك تشغيله من جديد.")
+
+async def start_bot(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    global AUTO_POST_ENABLED
+    if not is_developer(update):
+        await update.message.reply_text("❌ هذا الأمر خاص بالمطور فقط.")
+        return
+    AUTO_POST_ENABLED = True
+    save_auto_post_enabled(True)
+    await update.message.reply_text("▶️ تم تشغيل النشر التلقائي من جديد.")
+
 # ====================== لوحة تحكم المطور والمشرفين ======================
+
+async def broadcast_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not is_developer(update):
+        await update.message.reply_text("⛔ هذه الخاصية للمطور فقط.")
+        return
+
+    BROADCAST_MODE[update.effective_user.id] = True
+    await update.message.reply_text(
+        "📢 وضع إرسال رسالة للمشتركين مفعّل.\n\n"
+        "أرسل الآن الرسالة التي تريد إرسالها لجميع المشتركين.\n"
+        "يمكنك إرسال نص، أو صورة مع وصف، أو ملف.\n\n"
+        "❌ للإلغاء أرسل /cancel_broadcast"
+    )
+
+
+async def cancel_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not is_developer(update):
+        return
+    BROADCAST_MODE.pop(update.effective_user.id, None)
+    await update.message.reply_text("❌ تم إلغاء إرسال الرسالة للمشتركين.")
+
+
+async def handle_broadcast(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.effective_user
+    if not user or not is_developer(update):
+        return False
+
+    if user.id not in BROADCAST_MODE:
+        return False
+
+    message = update.effective_message
+    if not message:
+        return True
+
+    sent = 0
+    failed = 0
+
+    for chat_id in list(USERS):
+        try:
+            await message.copy(chat_id=chat_id)
+            sent += 1
+        except Exception as e:
+            failed += 1
+            logging.warning("فشل إرسال الرسالة إلى %s: %s", chat_id, e)
+
+    BROADCAST_MODE.pop(user.id, None)
+
+    await message.reply_text(
+        f"📢 تم إرسال الرسالة للمشتركين.\n\n"
+        f"✅ نجح: {sent}\n"
+        f"❌ فشل: {failed}\n"
+        f"👥 إجمالي المشتركين: {len(USERS)}"
+    )
+    return True
+
 async def panel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_staff(update):
         await update.message.reply_text("❌ هذه اللوحة خاصة بالمطور والمشرفين فقط.")
         return
 
     role = "👑 المطور" if is_developer(update) else "🛡️ مشرف"
+    status_text = "▶️ تشغيل النشر التلقائي" if not AUTO_POST_ENABLED else "⏸️ إيقاف النشر التلقائي"
+    status_callback = "admin_start_post" if not AUTO_POST_ENABLED else "admin_stop_post"
     keyboard = [
+        [InlineKeyboardButton("👥 عدد المشتركين", callback_data="admin_users"),
+            InlineKeyboardButton("📢 إرسال رسالة للمشتركين", callback_data="admin_broadcast"),
+            InlineKeyboardButton("⏸️ إيقاف النشر التلقائي", callback_data="admin_stop_posting"),
+            InlineKeyboardButton("▶️ تشغيل النشر التلقائي", callback_data="admin_start_posting"),
+            InlineKeyboardButton("⏸️ إيقاف البوت للمشتركين", callback_data="admin_stop_subscribers"),
+            InlineKeyboardButton("▶️ تشغيل البوت للمشتركين", callback_data="admin_start_subscribers")],
         [InlineKeyboardButton("➕ إضافة عنصر", callback_data="admin_add")],
         [InlineKeyboardButton("➖ حذف عنصر", callback_data="admin_delete")],
+        [InlineKeyboardButton(status_text, callback_data=status_callback)],
     ]
     if is_developer(update):
         keyboard.append([InlineKeyboardButton("👥 إدارة المشرفين", callback_data="admin_mods")])
@@ -871,6 +1097,9 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
 
 # ====================== المعالجات ======================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if await subscriber_gate(update, context):
+        return
+    register_user(update)
     welcome = (
         "𓆩♡𓆪  <b>بوت مودات ماين كرافت الافضل</b>  𓆩♡𓆪\n\n"
         "╔══════════════════════════╗\n"
@@ -946,8 +1175,123 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
+    if query.data == "admin_stop_posting":
+        if not is_developer(update):
+            await query.answer("⛔ للمطور فقط.", show_alert=True)
+            return
+        global AUTO_POST_ENABLED
+        AUTO_POST_ENABLED = False
+        save_auto_post_status()
+        await query.answer("⏸️ تم إيقاف النشر التلقائي.")
+        await query.message.reply_text("⏸️ تم إيقاف النشر التلقائي بنجاح.")
+        return
+
+    if query.data == "admin_start_posting":
+        if not is_developer(update):
+            await query.answer("⛔ للمطور فقط.", show_alert=True)
+            return
+        AUTO_POST_ENABLED = True
+        save_auto_post_status()
+        await query.answer("▶️ تم تشغيل النشر التلقائي.")
+        await query.message.reply_text("▶️ تم تشغيل النشر التلقائي من جديد.")
+        return
+
+    if query.data == "admin_stop_subscribers":
+        if not is_developer(update):
+            await query.answer("⛔ للمطور فقط.", show_alert=True)
+            return
+        global SUBSCRIBERS_BOT_ENABLED
+        SUBSCRIBERS_BOT_ENABLED = False
+        save_subscribers_bot_status()
+        await query.answer("⏸️ تم إيقاف البوت للمشتركين.")
+        await query.message.reply_text("⏸️ تم إيقاف البوت عند المشتركين.\nالمطور والمشرفون ما زال بإمكانهم استخدام لوحة التحكم.")
+        return
+
+    if query.data == "admin_start_subscribers":
+        if not is_developer(update):
+            await query.answer("⛔ للمطور فقط.", show_alert=True)
+            return
+        SUBSCRIBERS_BOT_ENABLED = True
+        save_subscribers_bot_status()
+        await query.answer("▶️ تم تشغيل البوت للمشتركين.")
+        await query.message.reply_text("▶️ تم تشغيل البوت عند المشتركين من جديد.")
+        return
+
+    if query.data == "admin_broadcast":
+        if not is_developer(update):
+            await query.answer("⛔ للمطور فقط.", show_alert=True)
+            return
+        BROADCAST_MODE[update.effective_user.id] = True
+        await query.answer()
+        await query.message.reply_text(
+            "📢 تم تفعيل إرسال رسالة للمشتركين.\n\n"
+            "أرسل الآن الرسالة التي تريد إرسالها لجميع المشتركين.\n"
+            "يمكنك إرسال نص أو صورة أو ملف.\n\n"
+            "❌ للإلغاء أرسل /cancel_broadcast"
+        )
+        return
+
     data = query.data
     
+    if data in ("admin_stop_post", "admin_start_post"):
+        global AUTO_POST_ENABLED
+        if not is_developer(update):
+            await query.answer("❌ هذه الخاصية للمطور فقط.", show_alert=True)
+            return
+        AUTO_POST_ENABLED = data == "admin_start_post"
+        save_auto_post_enabled(AUTO_POST_ENABLED)
+        await query.answer("تم تحديث الحالة")
+        role = "👑 المطور" if is_developer(update) else "🛡️ مشرف"
+        status = "🟢 النشر التلقائي يعمل" if AUTO_POST_ENABLED else "🔴 النشر التلقائي متوقف"
+        keyboard = [
+            [InlineKeyboardButton("👥 عدد المشتركين", callback_data="admin_users")],
+            [InlineKeyboardButton("➕ إضافة عنصر", callback_data="admin_add")],
+            [InlineKeyboardButton("➖ حذف عنصر", callback_data="admin_delete")],
+            [InlineKeyboardButton("⏸️ إيقاف النشر التلقائي" if AUTO_POST_ENABLED else "▶️ تشغيل النشر التلقائي", callback_data="admin_stop_post" if AUTO_POST_ENABLED else "admin_start_post")],
+        ]
+        if is_developer(update):
+            keyboard.append([InlineKeyboardButton("👥 إدارة المشرفين", callback_data="admin_mods")])
+        await query.edit_message_text(f"🛠️ <b>لوحة التحكم</b>\n\nصلاحيتك: {role}\n{status}\n\nاختر العملية:", reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
+        return
+
+    if data == "admin_users":
+        if not is_staff(update):
+            await query.answer("❌ غير مصرح لك.", show_alert=True)
+            return
+        await query.answer()
+        await query.edit_message_text(
+            f"📊 <b>إحصائيات البوت</b>\n\n"
+            f"👥 <b>عدد المشتركين:</b> {len(USERS)}\n\n"
+            f"🟢 يتم احتساب كل مستخدم بدأ استخدام البوت مرة واحدة.",
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("🔙 رجوع للوحة التحكم", callback_data="admin_panel")]
+            ]),
+            parse_mode="HTML"
+        )
+        return
+
+    if data == "admin_panel":
+        if not is_staff(update):
+            await query.answer("❌ غير مصرح لك.", show_alert=True)
+            return
+        await query.answer()
+        role = "👑 المطور" if is_developer(update) else "🛡️ مشرف"
+        status_text = "▶️ تشغيل النشر التلقائي" if not AUTO_POST_ENABLED else "⏸️ إيقاف النشر التلقائي"
+        status_callback = "admin_start_post" if not AUTO_POST_ENABLED else "admin_stop_post"
+        keyboard = [
+            [InlineKeyboardButton("👥 عدد المشتركين", callback_data="admin_users")],
+            [InlineKeyboardButton("➕ إضافة عنصر", callback_data="admin_add")],
+            [InlineKeyboardButton("➖ حذف عنصر", callback_data="admin_delete")],
+            [InlineKeyboardButton(status_text, callback_data=status_callback)],
+        ]
+        if is_developer(update):
+            keyboard.append([InlineKeyboardButton("👥 إدارة المشرفين", callback_data="admin_mods")])
+        await query.edit_message_text(
+            f"🛠️ <b>لوحة التحكم</b>\n\nصلاحيتك: {role}\n\nاختر العملية:",
+            reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML"
+        )
+        return
+
     if data == "admin_add":
         await admin_categories(update, context, "add")
         return
@@ -999,6 +1343,61 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await show_items(update, context, category_key, sub_name, page)
         return
 
+
+# ====================== حالة البوت للمشتركين ======================
+SUBSCRIBERS_BOT_ENABLED_FILE = "subscribers_bot_enabled.json"
+SUBSCRIBERS_BOT_ENABLED = True
+
+def load_subscribers_bot_status():
+    global SUBSCRIBERS_BOT_ENABLED
+    try:
+        import json
+        if os.path.exists(SUBSCRIBERS_BOT_ENABLED_FILE):
+            with open(SUBSCRIBERS_BOT_ENABLED_FILE, "r", encoding="utf-8") as f:
+                SUBSCRIBERS_BOT_ENABLED = bool(json.load(f).get("enabled", True))
+    except Exception:
+        SUBSCRIBERS_BOT_ENABLED = True
+
+def save_subscribers_bot_status():
+    import json
+    with open(SUBSCRIBERS_BOT_ENABLED_FILE, "w", encoding="utf-8") as f:
+        json.dump({"enabled": SUBSCRIBERS_BOT_ENABLED}, f, ensure_ascii=False)
+
+def subscribers_bot_is_enabled():
+    return SUBSCRIBERS_BOT_ENABLED
+
+async def stop_for_subscribers(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    global SUBSCRIBERS_BOT_ENABLED
+    if not is_developer(update):
+        await update.message.reply_text("❌ هذا الأمر خاص بالمطور.")
+        return
+    SUBSCRIBERS_BOT_ENABLED = False
+    save_subscribers_bot_status()
+    await update.message.reply_text("⏸️ تم إيقاف البوت عند المشتركين.\nالمطور والمشرفون ما زال بإمكانهم استخدام لوحة التحكم.")
+
+async def start_for_subscribers(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    global SUBSCRIBERS_BOT_ENABLED
+    if not is_developer(update):
+        await update.message.reply_text("❌ هذا الأمر خاص بالمطور.")
+        return
+    SUBSCRIBERS_BOT_ENABLED = True
+    save_subscribers_bot_status()
+    await update.message.reply_text("▶️ تم تشغيل البوت عند المشتركين.")
+
+async def subscriber_gate(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """يمنع المشتركين من استخدام البوت عندما يكون متوقفًا."""
+    if subscribers_bot_is_enabled():
+        return False
+
+    user = update.effective_user
+    if user and (user.id == DEVELOPER_ID or user.id in MODS_IDS):
+        return False
+
+    message = update.effective_message
+    if message:
+        await message.reply_text("⏸️ البوت متوقف مؤقتًا عند المشتركين. حاول لاحقًا.")
+    return True
+
 # ====================== تشغيل البوت ======================
 def main():
     TOKEN = os.environ.get("TOKEN")
@@ -1007,9 +1406,24 @@ def main():
     
     application = Application.builder().token(TOKEN).build()
     application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("stop_subscribers", stop_for_subscribers))
+    application.add_handler(CommandHandler("start_subscribers", start_for_subscribers))
+    application.add_handler(CommandHandler("broadcast", broadcast_command))
+    application.add_handler(CommandHandler("cancel_broadcast", cancel_broadcast))
     application.add_handler(CommandHandler("panel", panel))
+    application.add_handler(CommandHandler("post_now", post_now))
+    application.add_handler(CommandHandler("stop_bot", stop_bot))
+    application.add_handler(CommandHandler("start_bot", start_bot))
     application.add_handler(CallbackQueryHandler(handle_callback))
+
+    # نشر مودين يوميًا الساعة 8:00 مساءً بتوقيت اليمن
+    application.job_queue.run_daily(
+        auto_post_two_mods,
+        time=time(AUTO_POST_HOUR, AUTO_POST_MINUTE, tzinfo=ZoneInfo("Asia/Aden")),
+        name="daily_two_mods"
+    )
     from telegram.ext import MessageHandler, filters
+    application.add_handler(MessageHandler(filters.ALL & ~filters.COMMAND, handle_broadcast))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_admin_message))
     
     logging.info("✅ البوت يعمل الآن مع نظام الفئات الفرعية (الشادرات مقسمة حسب الاسم)!")
