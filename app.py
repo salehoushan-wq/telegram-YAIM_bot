@@ -1137,8 +1137,13 @@ async def admin_subscriptions(update: Update, context: ContextTypes.DEFAULT_TYPE
     if SUBSCRIPTIONS:
         for i,ch in enumerate(SUBSCRIPTIONS,1): lines.append(f"{i}. {html.escape(str(ch.get('name','قناة')))} — <code>{html.escape(str(ch.get('chat_id','')))}</code>")
     else: lines.append("لا توجد قنوات مضافة.")
-    lines += ["","➕ <code>اسم القناة | معرف القناة | رابط الاشتراك</code>","➖ <code>del 1</code>"]
-    await query.edit_message_text("\n".join(lines),parse_mode="HTML",reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 لوحة التحكم",callback_data="admin_panel")]]))
+    lines += ["","💡 يمكنك الإضافة أو الحذف من الأزرار بالأسفل."]
+    keyboard = [
+        [InlineKeyboardButton("➕ إضافة اشتراك", callback_data="admin_subscription_add")],
+        [InlineKeyboardButton("➖ حذف اشتراك", callback_data="admin_subscription_delete")],
+        [InlineKeyboardButton("🔙 لوحة التحكم", callback_data="admin_panel")],
+    ]
+    await query.edit_message_text("\n".join(lines),parse_mode="HTML",reply_markup=InlineKeyboardMarkup(keyboard))
 
 async def check_user_subscription(bot,user_id):
     if not SUBSCRIPTIONS: return True
@@ -1267,11 +1272,15 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
                 await update.message.reply_text("❌ رقم القناة غير صحيح."); return
             removed=SUBSCRIPTIONS.pop(int(n)-1); save_subscriptions(); context.user_data.clear()
             await update.message.reply_text(f"✅ تم حذف: {removed.get('name','القناة')}"); return
-        parts=[x.strip() for x in text.split("|",2)]
-        if len(parts)!=3 or not parts[0] or not parts[1] or not parts[2].startswith(("http://","https://")):
-            await update.message.reply_text("❌ الصيغة: اسم القناة | معرف القناة | رابط الاشتراك"); return
-        SUBSCRIPTIONS.append({"name":parts[0],"chat_id":parts[1],"url":parts[2]}); save_subscriptions(); context.user_data.clear()
-        await update.message.reply_text(f"✅ تمت إضافة: {parts[0]}"); return
+        if not text.startswith(("http://", "https://")):
+            await update.message.reply_text("❌ أرسل رابط الاشتراك فقط، مثال: https://t.me/mychannel"); return
+        m = re.search(r"(?:https?://)?t\.me/([A-Za-z0-9_]+)", text)
+        if not m:
+            await update.message.reply_text("❌ رابط غير صحيح. استخدم رابط قناة عام مثل: https://t.me/mychannel"); return
+        username = m.group(1)
+        SUBSCRIPTIONS.append({"name": f"@{username}", "chat_id": f"@{username}", "url": text})
+        save_subscriptions(); context.user_data.clear()
+        await update.message.reply_text(f"✅ تمت إضافة الاشتراك: @{username}"); return
 
     if action == "mods":
         if not is_developer(update):
@@ -1931,6 +1940,35 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if data == "admin_subscriptions":
         await admin_subscriptions(update, context)
+        return
+
+    if data == "admin_subscription_add":
+        if not is_staff(update):
+            await query.answer("❌ غير مصرح لك.", show_alert=True)
+            return
+        await query.answer()
+        context.user_data["admin_action"] = "subscriptions"
+        await query.edit_message_text(
+            "➕ <b>إضافة اشتراك إجباري</b>\n\n"
+            "أرسل <b>رابط الاشتراك</b> فقط:\n"
+            "<code>https://t.me/mychannel</code>",
+            parse_mode="HTML",
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 رجوع", callback_data="admin_subscriptions")]])
+        )
+        return
+
+    if data == "admin_subscription_delete":
+        if not is_staff(update):
+            await query.answer("❌ غير مصرح لك.", show_alert=True)
+            return
+        await query.answer()
+        context.user_data["admin_action"] = "subscriptions"
+        await query.edit_message_text(
+            "➖ <b>حذف اشتراك إجباري</b>\n\n"
+            "أرسل رقم القناة المراد حذفها، مثل: <code>del 1</code>",
+            parse_mode="HTML",
+            reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 رجوع", callback_data="admin_subscriptions")]])
+        )
         return
 
     if data == "admin_add":
