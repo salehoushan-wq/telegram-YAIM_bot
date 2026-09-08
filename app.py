@@ -1274,13 +1274,41 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
             await update.message.reply_text(f"✅ تم حذف: {removed.get('name','القناة')}"); return
         if not text.startswith(("http://", "https://")):
             await update.message.reply_text("❌ أرسل رابط الاشتراك فقط، مثال: https://t.me/mychannel"); return
-        m = re.search(r"(?:https?://)?t\.me/([A-Za-z0-9_]+)", text)
+        m = re.fullmatch(r"https?://t\.me/([A-Za-z0-9_]+)(?:/)?", text)
         if not m:
-            await update.message.reply_text("❌ رابط غير صحيح. استخدم رابط قناة عام مثل: https://t.me/mychannel"); return
+            await update.message.reply_text(
+                "❌ الرابط غير صحيح.\n\n"
+                "المسموح فقط رابط قناة أو مجموعة عامة، مثل:\n"
+                "https://t.me/mychannel"
+                "❌ روابط المجلدات addlist وروابط الدعوة الخاصة غير مسموحة."
+            )
+            return
         username = m.group(1)
-        SUBSCRIPTIONS.append({"name": f"@{username}", "chat_id": f"@{username}", "url": text})
+        try:
+            chat = await context.bot.get_chat(f"@{username}")
+        except Exception:
+            await update.message.reply_text(
+                "❌ لم أستطع العثور على القناة أو المجموعة.\n"
+                "تأكد أن الرابط عام وأن البوت يستطيع الوصول إليها."
+            )
+            return
+
+        if chat.type not in {"channel", "group", "supergroup"}:
+            await update.message.reply_text(
+                "❌ مسموح فقط بإضافة قناة أو مجموعة Telegram."
+            )
+            return
+
+        chat_name = getattr(chat, "title", None) or f"@{username}"
+        SUBSCRIPTIONS.append({
+            "name": chat_name,
+            "chat_id": chat.id,
+            "url": f"https://t.me/{username}"
+        })
         save_subscriptions(); context.user_data.clear()
-        await update.message.reply_text(f"✅ تمت إضافة الاشتراك: @{username}"); return
+        kind = "قناة" if chat.type == "channel" else "مجموعة"
+        await update.message.reply_text(f"✅ تمت إضافة {kind}: {chat_name}")
+        return
 
     if action == "mods":
         if not is_developer(update):
