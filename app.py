@@ -669,8 +669,8 @@ load_data()
 # ====================== النشر التلقائي اليومي ======================
 # ضع معرف القناة والمجموعة هنا.
 # يمكن أن يكون المعرف رقمًا مثل -1001234567890 أو اسم مستخدم مثل @my_channel
-AUTO_POST_CHANNEL = os.environ.get("AUTO_POST_CHANNEL", "@YOUR_CHANNEL")
-AUTO_POST_GROUP = os.environ.get("AUTO_POST_GROUP", "@YOUR_GROUP")
+AUTO_POST_CHANNEL = os.environ.get("AUTO_POST_CHANNEL", "@YAMI_X39")
+AUTO_POST_GROUP = os.environ.get("AUTO_POST_GROUP", "@llYzA8")
 
 AUTO_POST_FILE = "auto_post_state.json"
 
@@ -1095,6 +1095,133 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
         context.user_data.clear()
         await update.message.reply_text(f"✅ تم حذف: {removed.get('name', 'العنصر')}")
 
+
+# ====================== البحث لجميع المستخدمين ======================
+def normalize_search(text):
+    text = (text or "").strip().casefold()
+    # توحيد بعض أشكال الحروف العربية لتسهيل البحث
+    for a, b in {
+        "أ": "ا", "إ": "ا", "آ": "ا",
+        "ى": "ي", "ة": "ه",
+    }.items():
+        text = text.replace(a, b)
+    return text
+
+
+def search_all_items(keyword):
+    q = normalize_search(keyword)
+    if not q:
+        return []
+
+    results = []
+    for category_key, category in MAIN_CATEGORIES.items():
+        category_title = category.get("title", category_key)
+        for sub_name, items in category.get("subcategories", {}).items():
+            for item in items:
+                name = item.get("name", "")
+                haystack = normalize_search(
+                    f"{name} {sub_name} {category_title}"
+                )
+                if q in haystack:
+                    results.append({
+                        "name": name,
+                        "icon": item.get("icon", "🔹"),
+                        "link": item.get("link", "#"),
+                        "category": category_title,
+                        "subcategory": sub_name,
+                    })
+    return results
+
+
+async def search_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if await subscriber_gate(update, context):
+        return
+
+    keyword = " ".join(context.args).strip()
+    if not keyword:
+        context.user_data["search_mode"] = True
+        await update.message.reply_text(
+            "🔎 <b>البحث</b>\n\n"
+            "أرسل الآن اسم المود أو الماب أو الشادر أو الريسوس باك الذي تريد البحث عنه.\n\n"
+            "مثال: <code>PES</code> أو <code>Shaders</code>\n"
+            "❌ للإلغاء أرسل /cancel_search",
+            parse_mode="HTML"
+        )
+        return
+
+    await send_search_results(update, keyword)
+
+
+async def cancel_search(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    context.user_data.pop("search_mode", None)
+    await update.message.reply_text("❌ تم إلغاء البحث.")
+
+
+async def send_search_results(update: Update, keyword):
+    results = search_all_items(keyword)
+
+    if not results:
+        await update.effective_message.reply_text(
+            f"🔎 لا توجد نتائج لـ: <b>{keyword}</b>\n\n"
+            "جرّب كلمة أخرى.",
+            parse_mode="HTML"
+        )
+        return
+
+    shown = results[:20]
+    lines = [
+        f"🔎 <b>نتائج البحث عن:</b> {keyword}\n",
+        f"📊 تم العثور على <b>{len(results)}</b> نتيجة."
+    ]
+
+    keyboard = []
+    for item in shown:
+        lines.append(
+            f"\n{item['icon']} <b>{item['name']}</b>\n"
+            f"📂 {item['category']} ← {item['subcategory']}"
+        )
+        if item["link"].startswith(("http://", "https://")):
+            short_name = item["name"][:18] + ".." if len(item["name"]) > 18 else item["name"]
+            keyboard.append([
+                InlineKeyboardButton(
+                    f"⬇️ تحميل {short_name}",
+                    url=item["link"]
+                )
+            ])
+
+    if len(results) > 20:
+        lines.append("\n⚠️ يتم عرض أول 20 نتيجة فقط.")
+
+    keyboard.append([
+        InlineKeyboardButton("🔎 بحث جديد", callback_data="search_again"),
+        InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data="main_menu")
+    ])
+
+    await update.effective_message.reply_text(
+        "\n".join(lines),
+        reply_markup=InlineKeyboardMarkup(keyboard),
+        parse_mode="HTML"
+    )
+
+
+async def handle_search_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not context.user_data.get("search_mode"):
+        return False
+
+    if await subscriber_gate(update, context):
+        context.user_data.pop("search_mode", None)
+        return True
+
+    keyword = (update.effective_message.text or "").strip()
+    if not keyword:
+        await update.effective_message.reply_text("❌ أرسل كلمة للبحث.")
+        return True
+
+    context.user_data.pop("search_mode", None)
+    await send_search_results(update, keyword)
+    return True
+
+
 # ====================== المعالجات ======================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if await subscriber_gate(update, context):
@@ -1116,6 +1243,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     )
     
     keyboard = []
+    keyboard.append([InlineKeyboardButton("🔎 البحث في جميع الأقسام", callback_data="search_again")])
     for key, cat in MAIN_CATEGORIES.items():
         keyboard.append([InlineKeyboardButton(cat["title"], callback_data=f"main_{key}")])
     
@@ -1227,6 +1355,20 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "أرسل الآن الرسالة التي تريد إرسالها لجميع المشتركين.\n"
             "يمكنك إرسال نص أو صورة أو ملف.\n\n"
             "❌ للإلغاء أرسل /cancel_broadcast"
+        )
+        return
+
+    if query.data == "search_again":
+        if await subscriber_gate(update, context):
+            return
+        await query.answer()
+        context.user_data["search_mode"] = True
+        await query.message.reply_text(
+            "🔎 <b>البحث في جميع الأقسام</b>\n\n"
+            "أرسل اسم العنصر الذي تريد البحث عنه.\n"
+            "سيبحث البوت في جميع الأقسام والفئات.\n\n"
+            "❌ للإلغاء أرسل /cancel_search",
+            parse_mode="HTML"
         )
         return
 
@@ -1403,6 +1545,8 @@ def main():
     
     application = Application.builder().token(TOKEN).build()
     application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("search", search_command))
+    application.add_handler(CommandHandler("cancel_search", cancel_search))
     application.add_handler(CommandHandler("stop_subscribers", stop_for_subscribers))
     application.add_handler(CommandHandler("start_subscribers", start_for_subscribers))
     application.add_handler(CommandHandler("broadcast", broadcast_command))
