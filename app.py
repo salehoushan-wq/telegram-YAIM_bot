@@ -1,5 +1,6 @@
 import logging
 import os
+import json
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, CallbackQueryHandler, ContextTypes
 
@@ -601,6 +602,44 @@ MAIN_CATEGORIES = {
 
 ITEMS_PER_PAGE = 6
 
+# ====================== صلاحيات المطور والمشرفين ======================
+DEVELOPER_ID =  7370937034  # ضع هنا أي دي المطور
+MODS_IDS = {
+    111111111,  # المشرف الأول
+    222222222,  # المشرف الثاني
+}
+
+DATA_FILE = "bot_data.json"
+
+def is_staff(update: Update) -> bool:
+    user = update.effective_user
+    return bool(user and (user.id == DEVELOPER_ID or user.id in MODS_IDS))
+
+def is_developer(update: Update) -> bool:
+    user = update.effective_user
+    return bool(user and user.id == DEVELOPER_ID)
+
+def save_data():
+    try:
+        with open(DATA_FILE, "w", encoding="utf-8") as f:
+            json.dump({key: cat["subcategories"] for key, cat in MAIN_CATEGORIES.items()}, f, ensure_ascii=False, indent=2)
+    except Exception:
+        logging.exception("فشل حفظ البيانات")
+
+def load_data():
+    if not os.path.exists(DATA_FILE):
+        return
+    try:
+        with open(DATA_FILE, "r", encoding="utf-8") as f:
+            saved = json.load(f)
+        for key, subcategories in saved.items():
+            if key in MAIN_CATEGORIES and isinstance(subcategories, dict):
+                MAIN_CATEGORIES[key]["subcategories"] = subcategories
+    except Exception:
+        logging.exception("فشل تحميل البيانات")
+
+load_data()
+
 # ====================== دوال العرض ======================
 def build_list_text(items, page, per_page):
     start = page * per_page
@@ -655,6 +694,180 @@ def build_keyboard(items, page, per_page, prefix, back_callback=None):
     keyboard.append(back_row)
     
     return InlineKeyboardMarkup(keyboard)
+
+# ====================== لوحة تحكم المطور والمشرفين ======================
+async def panel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not is_staff(update):
+        await update.message.reply_text("❌ هذه اللوحة خاصة بالمطور والمشرفين فقط.")
+        return
+
+    role = "👑 المطور" if is_developer(update) else "🛡️ مشرف"
+    keyboard = [
+        [InlineKeyboardButton("➕ إضافة عنصر", callback_data="admin_add")],
+        [InlineKeyboardButton("➖ حذف عنصر", callback_data="admin_delete")],
+    ]
+    if is_developer(update):
+        keyboard.append([InlineKeyboardButton("👥 إدارة المشرفين", callback_data="admin_mods")])
+
+    await update.message.reply_text(
+        f"🛠️ <b>لوحة التحكم</b>\n\nصلاحيتك: {role}\n\nاختر العملية:",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+        parse_mode="HTML"
+    )
+
+async def admin_categories(update: Update, context: ContextTypes.DEFAULT_TYPE, action: str):
+    query = update.callback_query
+    if not is_staff(update):
+        await query.answer("❌ غير مصرح لك.", show_alert=True)
+        return
+    await query.answer()
+    context.user_data["admin_action"] = action
+    keyboard = []
+    for key, cat in MAIN_CATEGORIES.items():
+        keyboard.append([InlineKeyboardButton(cat["title"], callback_data=f"admincat_{action}_{key}")])
+    keyboard.append([InlineKeyboardButton("🔙 إلغاء", callback_data="admin_cancel")])
+    await query.edit_message_text(
+        "📂 <b>اختر القسم:</b>",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+        parse_mode="HTML"
+    )
+
+async def admin_subcategories(update: Update, context: ContextTypes.DEFAULT_TYPE, action: str, category_key: str):
+    query = update.callback_query
+    if not is_staff(update):
+        await query.answer("❌ غير مصرح لك.", show_alert=True)
+        return
+    await query.answer()
+    context.user_data["admin_action"] = action
+    context.user_data["admin_category"] = category_key
+    keyboard = []
+    for idx, sub_name in enumerate(MAIN_CATEGORIES[category_key]["subcategories"]):
+        keyboard.append([InlineKeyboardButton(f"📂 {sub_name}", callback_data=f"adminsub_{action}_{category_key}_{idx}")])
+    keyboard.append([InlineKeyboardButton("🔙 إلغاء", callback_data="admin_cancel")])
+    await query.edit_message_text(
+        "📁 <b>اختر الفئة:</b>",
+        reply_markup=InlineKeyboardMarkup(keyboard),
+        parse_mode="HTML"
+    )
+
+async def admin_select_sub(update: Update, context: ContextTypes.DEFAULT_TYPE, action: str, category_key: str, index: int):
+    query = update.callback_query
+    if not is_staff(update):
+        await query.answer("❌ غير مصرح لك.", show_alert=True)
+        return
+    await query.answer()
+    subcats = list(MAIN_CATEGORIES[category_key]["subcategories"].keys())
+    if index < 0 or index >= len(subcats):
+        await query.edit_message_text("❌ الفئة غير موجودة.")
+        return
+    sub_name = subcats[index]
+    context.user_data["admin_category"] = category_key
+    context.user_data["admin_sub"] = sub_name
+    context.user_data["admin_action"] = action
+
+    if action == "add":
+        await query.edit_message_text(
+            f"➕ <b>إضافة عنصر إلى:</b> {sub_name}\n\n"
+            "أرسل في رسالة واحدة بهذا الشكل:\n"
+            "<code>اسم العنصر | الرابط | الأيقونة</code>\n\n"
+            "مثال: <code>مود جديد | https://example.com | 🔥</code>",
+            parse_mode="HTML"
+        )
+    else:
+        items = MAIN_CATEGORIES[category_key]["subcategories"][sub_name]
+        if not items:
+            await query.edit_message_text("❌ لا توجد عناصر في هذه الفئة.")
+            return
+        lines = [f"{i+1}. {item.get('name', 'بدون اسم')}" for i, item in enumerate(items)]
+        await query.edit_message_text(
+            f"➖ <b>حذف عنصر من:</b> {sub_name}\n\n"
+            + "\n".join(lines)
+            + "\n\nأرسل <b>رقم العنصر</b> الذي تريد حذفه.",
+            parse_mode="HTML"
+        )
+
+async def admin_mods(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    if not is_developer(update):
+        await query.answer("❌ هذه الخاصية للمطور فقط.", show_alert=True)
+        return
+    await query.answer()
+    mods = sorted(MODS_IDS)
+    text = "👥 <b>المشرفون الحاليون:</b>\n\n" + ("\n".join(f"• <code>{x}</code>" for x in mods) if mods else "لا يوجد مشرفون")
+    text += "\n\nلإضافة مشرف، أرسل: <code>add 123456789</code>\nلحذف مشرف، أرسل: <code>del 123456789</code>"
+    context.user_data["admin_action"] = "mods"
+    await query.edit_message_text(text, parse_mode="HTML")
+
+async def admin_cancel(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    context.user_data.clear()
+    await query.edit_message_text("✅ تم إلغاء العملية. أرسل /panel لفتح لوحة التحكم.")
+
+async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if not is_staff(update):
+        return
+    action = context.user_data.get("admin_action")
+    if not action:
+        return
+    text = (update.message.text or "").strip()
+
+    if action == "mods":
+        if not is_developer(update):
+            await update.message.reply_text("❌ هذه العملية للمطور فقط.")
+            return
+        parts = text.split()
+        if len(parts) != 2 or parts[0].lower() not in {"add", "del"} or not parts[1].isdigit():
+            await update.message.reply_text("❌ الصيغة غير صحيحة. استخدم: add 123456789 أو del 123456789")
+            return
+        mod_id = int(parts[1])
+        if parts[0].lower() == "add":
+            MODS_IDS.add(mod_id)
+            await update.message.reply_text(f"✅ تمت إضافة المشرف: {mod_id}")
+        else:
+            MODS_IDS.discard(mod_id)
+            await update.message.reply_text(f"✅ تمت إزالة المشرف: {mod_id}")
+        context.user_data.clear()
+        return
+
+    category_key = context.user_data.get("admin_category")
+    sub_name = context.user_data.get("admin_sub")
+    if category_key not in MAIN_CATEGORIES or not sub_name:
+        context.user_data.clear()
+        await update.message.reply_text("❌ انتهت العملية. أرسل /panel مرة أخرى.")
+        return
+
+    items = MAIN_CATEGORIES[category_key]["subcategories"].get(sub_name)
+    if items is None:
+        context.user_data.clear()
+        await update.message.reply_text("❌ الفئة غير موجودة.")
+        return
+
+    if action == "add":
+        parts = [x.strip() for x in text.split("|", 2)]
+        if len(parts) < 2 or not parts[0] or not parts[1].startswith(("http://", "https://")):
+            await update.message.reply_text("❌ الصيغة: اسم العنصر | الرابط | الأيقونة")
+            return
+        name, link = parts[0], parts[1]
+        icon = parts[2] if len(parts) == 3 and parts[2] else "🔹"
+        items.append({"num": f"{len(items)+1}️⃣", "name": name, "icon": icon, "link": link})
+        save_data()
+        context.user_data.clear()
+        await update.message.reply_text(f"✅ تمت إضافة: {name}\n📁 الفئة: {sub_name}")
+        return
+
+    if action == "delete":
+        if not text.isdigit():
+            await update.message.reply_text("❌ أرسل رقم العنصر فقط.")
+            return
+        index = int(text) - 1
+        if index < 0 or index >= len(items):
+            await update.message.reply_text("❌ رقم العنصر غير صحيح.")
+            return
+        removed = items.pop(index)
+        save_data()
+        context.user_data.clear()
+        await update.message.reply_text(f"✅ تم حذف: {removed.get('name', 'العنصر')}")
 
 # ====================== المعالجات ======================
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -735,6 +948,32 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     data = query.data
     
+    if data == "admin_add":
+        await admin_categories(update, context, "add")
+        return
+
+    if data == "admin_delete":
+        await admin_categories(update, context, "delete")
+        return
+
+    if data == "admin_mods":
+        await admin_mods(update, context)
+        return
+
+    if data == "admin_cancel":
+        await admin_cancel(update, context)
+        return
+
+    if data.startswith("admincat_"):
+        parts = data.split("_", 2)
+        await admin_subcategories(update, context, parts[1], parts[2])
+        return
+
+    if data.startswith("adminsub_"):
+        parts = data.split("_")
+        await admin_select_sub(update, context, parts[1], parts[2], int(parts[3]))
+        return
+
     if data == "main_menu":
         await main_menu(update, context)
         return
@@ -768,7 +1007,10 @@ def main():
     
     application = Application.builder().token(TOKEN).build()
     application.add_handler(CommandHandler("start", start))
+    application.add_handler(CommandHandler("panel", panel))
     application.add_handler(CallbackQueryHandler(handle_callback))
+    from telegram.ext import MessageHandler, filters
+    application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_admin_message))
     
     logging.info("✅ البوت يعمل الآن مع نظام الفئات الفرعية (الشادرات مقسمة حسب الاسم)!")
     application.run_polling(allowed_updates=Update.ALL_TYPES)
