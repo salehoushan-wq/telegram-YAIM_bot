@@ -1,4 +1,7 @@
 import logging
+import asyncio
+from pathlib import Path
+import aiohttp
 import unicodedata
 import re
 import os
@@ -617,6 +620,17 @@ MODS_IDS = {
 
 DATA_FILE = "bot_data.json"
 USERS_FILE = "bot_users.json"
+MODS_FILE = "staff_mods.json"
+SUBSCRIPTIONS_FILE = "subscriptions.json"
+SUBSCRIPTIONS = []
+
+def load_mods_ids():
+    global MODS_IDS
+    try:
+        if os.path.exists(MODS_FILE):
+            with open(MODS_FILE,"r",encoding="utf-8") as f: MODS_IDS={int(x) for x in json.load(f)}
+    except Exception: logging.exception("فشل تحميل المشرفين")
+load_mods_ids()
 
 def load_users():
     if not os.path.exists(USERS_FILE):
@@ -669,6 +683,20 @@ def load_data():
         logging.exception("فشل تحميل البيانات")
 
 load_data()
+
+def load_subscriptions():
+    global SUBSCRIPTIONS
+    try:
+        if os.path.exists(SUBSCRIPTIONS_FILE):
+            with open(SUBSCRIPTIONS_FILE, "r", encoding="utf-8") as f:
+                data=json.load(f); SUBSCRIPTIONS=data if isinstance(data,list) else []
+    except Exception: logging.exception("فشل تحميل الاشتراكات")
+
+def save_subscriptions():
+    try:
+        with open(SUBSCRIPTIONS_FILE,"w",encoding="utf-8") as f: json.dump(SUBSCRIPTIONS,f,ensure_ascii=False,indent=2)
+    except Exception: logging.exception("فشل حفظ الاشتراكات")
+load_subscriptions()
 
 # ====================== النشر التلقائي اليومي ======================
 # ضع معرف القناة والمجموعة هنا.
@@ -1087,29 +1115,53 @@ async def panel(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_staff(update):
         await update.message.reply_text("❌ هذه اللوحة خاصة بالمطور والمشرفين فقط.")
         return
-
     role = "👑 المطور" if is_developer(update) else "🛡️ مشرف"
-    status_text = "▶️ تشغيل النشر التلقائي" if not AUTO_POST_ENABLED else "⏸️ إيقاف النشر التلقائي"
-    status_callback = "admin_start_post" if not AUTO_POST_ENABLED else "admin_stop_post"
+    post = "🟢 يعمل" if AUTO_POST_ENABLED else "🔴 متوقف"
+    users = "🟢 يعمل" if SUBSCRIBERS_BOT_ENABLED else "🔴 متوقف"
     keyboard = [
-        [InlineKeyboardButton("👥 عدد المشتركين", callback_data="admin_users"),
-            InlineKeyboardButton("📢 إرسال رسالة للمشتركين", callback_data="admin_broadcast"),
-            InlineKeyboardButton("⏸️ إيقاف النشر التلقائي", callback_data="admin_stop_posting"),
-            InlineKeyboardButton("▶️ تشغيل النشر التلقائي", callback_data="admin_start_posting"),
-            InlineKeyboardButton("⏸️ إيقاف البوت للمشتركين", callback_data="admin_stop_subscribers"),
-            InlineKeyboardButton("▶️ تشغيل البوت للمشتركين", callback_data="admin_start_subscribers")],
-        [InlineKeyboardButton("➕ إضافة عنصر", callback_data="admin_add")],
-        [InlineKeyboardButton("➖ حذف عنصر", callback_data="admin_delete")],
-        [InlineKeyboardButton(status_text, callback_data=status_callback)],
+        [InlineKeyboardButton("👥 عدد المشتركين", callback_data="admin_users")],
+        [InlineKeyboardButton("📢 إرسال رسالة للمشتركين", callback_data="admin_broadcast")],
+        [InlineKeyboardButton("📢 إدارة الاشتراك", callback_data="admin_subscriptions")],
+        [InlineKeyboardButton("➕ إضافة عنصر", callback_data="admin_add"), InlineKeyboardButton("➖ حذف عنصر", callback_data="admin_delete")],
+        [InlineKeyboardButton("⏸️ إيقاف النشر", callback_data="admin_stop_posting"), InlineKeyboardButton("▶️ تشغيل النشر", callback_data="admin_start_posting")],
+        [InlineKeyboardButton("⏸️ إيقاف البوت للمشتركين", callback_data="admin_stop_subscribers"), InlineKeyboardButton("▶️ تشغيل البوت للمشتركين", callback_data="admin_start_subscribers")],
     ]
-    if is_developer(update):
-        keyboard.append([InlineKeyboardButton("👥 إدارة المشرفين", callback_data="admin_mods")])
+    if is_developer(update): keyboard.append([InlineKeyboardButton("👥 إدارة المشرفين", callback_data="admin_mods")])
+    await update.message.reply_text(f"🛠️ <b>لوحة التحكم</b>\n\nصلاحيتك: {role}\n📢 النشر التلقائي: {post}\n👥 البوت للمشتركين: {users}\n\nاختر العملية:",reply_markup=InlineKeyboardMarkup(keyboard),parse_mode="HTML")
 
-    await update.message.reply_text(
-        f"🛠️ <b>لوحة التحكم</b>\n\nصلاحيتك: {role}\n\nاختر العملية:",
-        reply_markup=InlineKeyboardMarkup(keyboard),
-        parse_mode="HTML"
-    )
+async def admin_subscriptions(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query=update.callback_query
+    if not is_staff(update): await query.answer("❌ غير مصرح لك.",show_alert=True); return
+    await query.answer(); context.user_data["admin_action"]="subscriptions"
+    lines=["📢 <b>إدارة الاشتراك الإجباري</b>",""]
+    if SUBSCRIPTIONS:
+        for i,ch in enumerate(SUBSCRIPTIONS,1): lines.append(f"{i}. {html.escape(str(ch.get('name','قناة')))} — <code>{html.escape(str(ch.get('chat_id','')))}</code>")
+    else: lines.append("لا توجد قنوات مضافة.")
+    lines += ["","➕ <code>اسم القناة | معرف القناة | رابط الاشتراك</code>","➖ <code>del 1</code>"]
+    await query.edit_message_text("\n".join(lines),parse_mode="HTML",reply_markup=InlineKeyboardMarkup([[InlineKeyboardButton("🔙 لوحة التحكم",callback_data="admin_panel")]]))
+
+async def check_user_subscription(bot,user_id):
+    if not SUBSCRIPTIONS: return True
+    for ch in SUBSCRIPTIONS:
+        try:
+            m=await bot.get_chat_member(ch.get("chat_id"),user_id)
+            if m.status in {"left","kicked"}: return False
+        except Exception as e:
+            logging.warning("فشل التحقق من الاشتراك: %s",e); return False
+    return True
+
+async def subscription_gate(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    if is_staff(update) or not update.effective_user: return False
+    if await check_user_subscription(context.bot,update.effective_user.id): return False
+    msg=update.effective_message
+    if not msg: return True
+    kb=[]
+    for ch in SUBSCRIPTIONS:
+        url=ch.get("url")
+        if isinstance(url,str) and url.startswith(("http://","https://")): kb.append([InlineKeyboardButton(f"📢 {ch.get('name','اشترك')}",url=url)])
+    kb.append([InlineKeyboardButton("✅ تحقق من الاشتراك",callback_data="check_subscription")])
+    await msg.reply_text("🔒 <b>الاشتراك مطلوب</b>\n\nاشترك في القنوات ثم اضغط تحقق من الاشتراك.",reply_markup=InlineKeyboardMarkup(kb),parse_mode="HTML")
+    return True
 
 async def admin_categories(update: Update, context: ContextTypes.DEFAULT_TYPE, action: str):
     query = update.callback_query
@@ -1208,6 +1260,19 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
         return
     text = (update.message.text or "").strip()
 
+    if action == "subscriptions":
+        if text.lower().startswith("del "):
+            n=text.split(maxsplit=1)[1] if len(text.split(maxsplit=1))>1 else ""
+            if not n.isdigit() or not 1 <= int(n) <= len(SUBSCRIPTIONS):
+                await update.message.reply_text("❌ رقم القناة غير صحيح."); return
+            removed=SUBSCRIPTIONS.pop(int(n)-1); save_subscriptions(); context.user_data.clear()
+            await update.message.reply_text(f"✅ تم حذف: {removed.get('name','القناة')}"); return
+        parts=[x.strip() for x in text.split("|",2)]
+        if len(parts)!=3 or not parts[0] or not parts[1] or not parts[2].startswith(("http://","https://")):
+            await update.message.reply_text("❌ الصيغة: اسم القناة | معرف القناة | رابط الاشتراك"); return
+        SUBSCRIPTIONS.append({"name":parts[0],"chat_id":parts[1],"url":parts[2]}); save_subscriptions(); context.user_data.clear()
+        await update.message.reply_text(f"✅ تمت إضافة: {parts[0]}"); return
+
     if action == "mods":
         if not is_developer(update):
             await update.message.reply_text("❌ هذه العملية للمطور فقط.")
@@ -1219,9 +1284,11 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
         mod_id = int(parts[1])
         if parts[0].lower() == "add":
             MODS_IDS.add(mod_id)
+            with open(MODS_FILE,"w",encoding="utf-8") as f: json.dump(sorted(MODS_IDS),f)
             await update.message.reply_text(f"✅ تمت إضافة المشرف: {mod_id}")
         else:
             MODS_IDS.discard(mod_id)
+            with open(MODS_FILE,"w",encoding="utf-8") as f: json.dump(sorted(MODS_IDS),f)
             await update.message.reply_text(f"✅ تمت إزالة المشرف: {mod_id}")
         context.user_data.clear()
         return
@@ -1686,7 +1753,18 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     global AUTO_POST_ENABLED, SUBSCRIBERS_BOT_ENABLED
     query = update.callback_query
-    if query.data == "admin_stop_posting":
+    data = query.data or ""
+    if data == "check_subscription":
+        if await check_user_subscription(context.bot, update.effective_user.id):
+            await query.answer("✅ تم التحقق بنجاح.", show_alert=True)
+            await query.edit_message_text("✅ تم التحقق من اشتراكك. أرسل /start للمتابعة.")
+        else:
+            await query.answer("❌ لم يكتمل الاشتراك بعد.", show_alert=True)
+        return
+    if not data.startswith("admin_") and await subscription_gate(update, context):
+        await query.answer()
+        return
+    if data == "admin_stop_posting":
         if not is_developer(update):
             await query.answer("⛔ للمطور فقط.", show_alert=True)
             return
@@ -1802,6 +1880,8 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         status = "🟢 النشر التلقائي يعمل" if AUTO_POST_ENABLED else "🔴 النشر التلقائي متوقف"
         keyboard = [
             [InlineKeyboardButton("👥 عدد المشتركين", callback_data="admin_users")],
+            [InlineKeyboardButton("📢 إرسال رسالة للمشتركين", callback_data="admin_broadcast")],
+            [InlineKeyboardButton("📢 إدارة الاشتراك", callback_data="admin_subscriptions")],
             [InlineKeyboardButton("➕ إضافة عنصر", callback_data="admin_add")],
             [InlineKeyboardButton("➖ حذف عنصر", callback_data="admin_delete")],
             [InlineKeyboardButton("⏸️ إيقاف النشر التلقائي" if AUTO_POST_ENABLED else "▶️ تشغيل النشر التلقائي", callback_data="admin_stop_post" if AUTO_POST_ENABLED else "admin_start_post")],
@@ -1847,6 +1927,10 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             f"🛠️ <b>لوحة التحكم</b>\n\nصلاحيتك: {role}\n\nاختر العملية:",
             reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML"
         )
+        return
+
+    if data == "admin_subscriptions":
+        await admin_subscriptions(update, context)
         return
 
     if data == "admin_add":
@@ -1906,6 +1990,7 @@ SUBSCRIBERS_BOT_ENABLED_FILE = "subscribers_bot_enabled.json"
 SUBSCRIBERS_BOT_ENABLED = True
 
 def load_subscribers_bot_status():
+    global SUBSCRIBERS_BOT_ENABLED
     try:
         import json
         if os.path.exists(SUBSCRIBERS_BOT_ENABLED_FILE):
