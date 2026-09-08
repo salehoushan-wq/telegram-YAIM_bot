@@ -1174,14 +1174,14 @@ async def main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.edit_message_text(menu_text, reply_markup=InlineKeyboardMarkup(keyboard), parse_mode="HTML")
 
 async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    global AUTO_POST_ENABLED, SUBSCRIBERS_BOT_ENABLED
     query = update.callback_query
     if query.data == "admin_stop_posting":
         if not is_developer(update):
             await query.answer("⛔ للمطور فقط.", show_alert=True)
             return
-        global AUTO_POST_ENABLED
         AUTO_POST_ENABLED = False
-        save_auto_post_status()
+        save_auto_post_enabled(AUTO_POST_ENABLED)
         await query.answer("⏸️ تم إيقاف النشر التلقائي.")
         await query.message.reply_text("⏸️ تم إيقاف النشر التلقائي بنجاح.")
         return
@@ -1191,7 +1191,7 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await query.answer("⛔ للمطور فقط.", show_alert=True)
             return
         AUTO_POST_ENABLED = True
-        save_auto_post_status()
+        save_auto_post_enabled(AUTO_POST_ENABLED)
         await query.answer("▶️ تم تشغيل النشر التلقائي.")
         await query.message.reply_text("▶️ تم تشغيل النشر التلقائي من جديد.")
         return
@@ -1200,7 +1200,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if not is_developer(update):
             await query.answer("⛔ للمطور فقط.", show_alert=True)
             return
-        global SUBSCRIBERS_BOT_ENABLED
         SUBSCRIBERS_BOT_ENABLED = False
         save_subscribers_bot_status()
         await query.answer("⏸️ تم إيقاف البوت للمشتركين.")
@@ -1234,7 +1233,6 @@ async def handle_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     data = query.data
     
     if data in ("admin_stop_post", "admin_start_post"):
-        global AUTO_POST_ENABLED
         if not is_developer(update):
             await query.answer("❌ هذه الخاصية للمطور فقط.", show_alert=True)
             return
@@ -1349,7 +1347,6 @@ SUBSCRIBERS_BOT_ENABLED_FILE = "subscribers_bot_enabled.json"
 SUBSCRIBERS_BOT_ENABLED = True
 
 def load_subscribers_bot_status():
-    global SUBSCRIBERS_BOT_ENABLED
     try:
         import json
         if os.path.exists(SUBSCRIBERS_BOT_ENABLED_FILE):
