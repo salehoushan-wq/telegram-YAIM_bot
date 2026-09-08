@@ -1148,6 +1148,8 @@ async def admin_subscriptions(update: Update, context: ContextTypes.DEFAULT_TYPE
 async def check_user_subscription(bot,user_id):
     if not SUBSCRIPTIONS: return True
     for ch in SUBSCRIPTIONS:
+        if ch.get("type") == "addlist" or not ch.get("chat_id"):
+            continue
         try:
             m=await bot.get_chat_member(ch.get("chat_id"),user_id)
             if m.status in {"left","kicked"}: return False
@@ -1274,13 +1276,26 @@ async def handle_admin_message(update: Update, context: ContextTypes.DEFAULT_TYP
             await update.message.reply_text(f"✅ تم حذف: {removed.get('name','القناة')}"); return
         if not text.startswith(("http://", "https://")):
             await update.message.reply_text("❌ أرسل رابط الاشتراك فقط، مثال: https://t.me/mychannel"); return
+        addlist = re.fullmatch(r"https?://t\.me/addlist/([A-Za-z0-9_-]+)(?:/)?", text)
+        if addlist:
+            code = addlist.group(1)
+            SUBSCRIPTIONS.append({
+                "name": f"addlist/{code}",
+                "chat_id": None,
+                "url": text,
+                "type": "addlist"
+            })
+            save_subscriptions(); context.user_data.clear()
+            await update.message.reply_text("✅ تمت إضافة رابط addlist بنجاح.")
+            return
+
         m = re.fullmatch(r"https?://t\.me/([A-Za-z0-9_]+)(?:/)?", text)
         if not m:
             await update.message.reply_text(
                 "❌ الرابط غير صحيح.\n\n"
-                "المسموح فقط رابط قناة أو مجموعة عامة، مثل:\n"
-                "https://t.me/mychannel"
-                "❌ روابط المجلدات addlist وروابط الدعوة الخاصة غير مسموحة."
+                "المسموح: رابط قناة/مجموعة أو رابط addlist.\n"
+                "مثال: https://t.me/mychannel\n"
+                "أو: https://t.me/addlist/XXXXXXXX"
             )
             return
         username = m.group(1)
