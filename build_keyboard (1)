@@ -1,0 +1,71 @@
+from typing import List, Dict, Any, Optional
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+
+def build_paginated_keyboard(
+    items: List[Dict[str, Any]],
+    page: int,
+    callback_prefix: str,
+    items_per_page: int = 10,
+    button_text_template: str = "⬇️ تحميل {name}",
+    name_fallback: str = "عنصر",
+    name_max_length: Optional[int] = 10,
+    show_main_menu: bool = True,
+    main_menu_callback: str = "main_menu"
+) -> InlineKeyboardMarkup:
+    """
+    تُنشئ لوحة مفاتيح تفاعلية مع ترقيم صفحات لعرض قائمة عناصر.
+
+    المعاملات:
+        items: قائمة العناصر (كل عنصر dict يحتوي على 'name' و 'link' على الأقل).
+        page: رقم الصفحة الحالية (يبدأ من 0).
+        callback_prefix: بادئة callback_data للأزرار (يضاف إليها رقم الصفحة).
+        items_per_page: عدد العناصر في الصفحة الواحدة.
+        button_text_template: قالب نص الزر، يُستخدم مع format(name=name).
+        name_fallback: النص الافتراضي إذا كان 'name' غير موجود.
+        name_max_length: أقصى طول للاسم (None لعدم التقييد).
+        show_main_menu: إظهار زر القائمة الرئيسية في الأسفل.
+        main_menu_callback: callback_data لزر القائمة الرئيسية.
+
+    تُرجع:
+        InlineKeyboardMarkup جاهز للإرسال.
+    """
+    # حساب حدود الصفحة
+    total_items = len(items)
+    start = page * items_per_page
+    end = min(start + items_per_page, total_items)
+
+    keyboard = []
+
+    # إضافة أزرار العناصر
+    for idx in range(start, end):
+        item = items[idx]
+        name = item.get('name', name_fallback)
+        # اختصار الاسم إذا لزم الأمر
+        if name_max_length and len(name) > name_max_length:
+            display_name = name[:name_max_length] + "…"
+        else:
+            display_name = name
+
+        link = item.get('link', '#')
+        btn_text = button_text_template.format(name=display_name)
+        keyboard.append([InlineKeyboardButton(btn_text, url=link)])
+
+    # أزرار التنقل بين الصفحات
+    nav_buttons = []
+    if page > 0:
+        nav_buttons.append(
+            InlineKeyboardButton("◀️ السابق", callback_data=f"{callback_prefix}_{page-1}")
+        )
+    if end < total_items:
+        nav_buttons.append(
+            InlineKeyboardButton("التالي ▶️", callback_data=f"{callback_prefix}_{page+1}")
+        )
+
+    if nav_buttons:
+        keyboard.append(nav_buttons)
+
+    # زر القائمة الرئيسية (اختياري)
+    if show_main_menu:
+        keyboard.append([InlineKeyboardButton("🏠 القائمة الرئيسية", callback_data=main_menu_callback)])
+
+    return InlineKeyboardMarkup(keyboard)
